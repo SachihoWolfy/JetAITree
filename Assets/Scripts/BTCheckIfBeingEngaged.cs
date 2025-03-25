@@ -11,7 +11,6 @@ public class BTCheckIfBeingEngaged : BTNode
     {
         if (ai.IsInDanger())
         {
-            ai.target = ai.FindBestTarget(); // Find the best target for evasion or counterattack
             return true;
         }
         return false;

@@ -1,3 +1,5 @@
+using System.Runtime;
+
 public class BTEngagePursuer : BTNode
 {
     private AIAircraft ai;
@@ -9,10 +11,10 @@ public class BTEngagePursuer : BTNode
 
     public override bool Execute()
     {
-        ai.currentState = "Trying to engage Pursuer";
-        ai.FindBestTarget();
-        if (ai.target != null && !ai.IsInDanger())
+        if (ai.IsInDanger()&& ai.target != ai.threats[0] && ai.threats[0]!=null)
         {
+            ai.currentState = "Trying to engage Pursuer";
+            ai.TargetPursuer();
             return true;
         }
         return false;

@@ -8,6 +8,7 @@ public class BTDogfight : BTNode
     {
         if (aircraft.CanEngageEnemy())
         {
+            aircraft.currentState = "Dogfighting";
             aircraft.EngageDogfight();
             return true;
         }

@@ -1,3 +1,5 @@
+using UnityEngine;
+
 public class BTCheckTeammateInDanger : BTNode
 {
     private AIAircraft ai;
@@ -9,11 +11,21 @@ public class BTCheckTeammateInDanger : BTNode
 
     public override bool Execute()
     {
+        float minDistance = 10000f;
+        Transform curThreat = null;
         foreach (var teammate in ai.teammates)
         {
             if (teammate.IsInDanger())
             {
-                ai.target = teammate.target; // Target the enemy that's threatening the teammate
+                if((teammate.threats[0].transform.position - ai.transform.position).magnitude < minDistance)
+                {
+                    minDistance = (teammate.threats[0].transform.position - ai.transform.position).magnitude;
+                    curThreat = teammate.threats[0].transform;
+                }
+                
+            }
+            if(curThreat != null)
+            {
                 return true;
             }
         }

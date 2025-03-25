@@ -9,14 +9,12 @@ public class BTProtectTeammate : BTNode
 
     public override bool Execute()
     {
-        ai.currentState = "Protecting";
-        ai.FindBestTarget();
         if (ai.target != null && !ai.IsInDanger())
         {
+            ai.currentState = "Protecting";
             ai.EngageDogfight();
             return true;
         }
-        ai.PerformEvasiveManeuver();
         return false;
     }
 }

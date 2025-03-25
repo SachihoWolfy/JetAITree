@@ -37,12 +37,13 @@ public class AIAircraft : MonoBehaviour
         // Add a branch for responding to teammates in danger
         BTSelector teammateProtectionSelector = new BTSelector();
         teammateProtectionSelector.AddChild(new BTCheckTeammateInDanger(this));
-        teammateProtectionSelector.AddChild(new BTProtectTeammate(this)); // Implement the protection logic
+        teammateProtectionSelector.AddChild(new BTProtectTeammate(this));
 
         // Add a branch for responding to being engaged by a threat
         BTSelector threatEngagementSelector = new BTSelector();
         threatEngagementSelector.AddChild(new BTCheckIfBeingEngaged(this));
         threatEngagementSelector.AddChild(new BTEngagePursuer(this)); // Implement the pursuit behavior
+        threatEngagementSelector.AddChild(teammateProtectionSelector);
 
         // Existing behavior
         BTSequence evadeSequence = new BTSequence();
@@ -55,10 +56,9 @@ public class AIAircraft : MonoBehaviour
         strafingSequence.AddChild(new BTStrafingRun(this));
 
         // Root sequence: add the new branches
-        root.AddChild(teammateProtectionSelector);
-        root.AddChild(threatEngagementSelector);
         root.AddChild(evadeSequence);
         root.AddChild(dogfightSequence);
+        root.AddChild(teammateProtectionSelector);
         root.AddChild(strafingSequence);
 
         behaviorTree = root;
@@ -68,17 +68,13 @@ public class AIAircraft : MonoBehaviour
     {
         if (target == null)
         {
-            foreach (var enemy in allAircraft.Where(a => a.team != this.team))
-            {
-                if (target == null)
-                {
-                    target = enemy.transform;
-                }
-            }
+            target = FindBestTarget();
         }
+        UpdateTeammates();
         UpdateThreats();
         UpdateTeamTargets();
         behaviorTree.Execute();
+        engagementTime += Time.deltaTime;
     }
 
     // ------------------ THREAT & TEAM AWARENESS ------------------
@@ -91,6 +87,17 @@ public class AIAircraft : MonoBehaviour
             if (enemy.target == this.transform)
             {
                 threats.Add(enemy);
+            }
+        }
+    }
+    private void UpdateTeammates() 
+    {
+        teammates.Clear();
+        foreach (var aircraft in allAircraft)
+        {
+            if(aircraft.team == team && aircraft != this)
+            {
+                teammates.Add(aircraft);
             }
         }
     }
@@ -130,31 +137,28 @@ public class AIAircraft : MonoBehaviour
         target = threats[0].transform;
     }
 
-    float engagementTime;
-    Transform prevTarget;
-    public Transform FindBestTarget()
+    public void TargetProtection()
     {
+        FindBestTarget(10f);
+    }
+
+    float engagementTime;
+    float engagementThreshold = 5f; // Seconds before the AI starts penalizing the current target
+    Transform prevTarget;
+    public Transform FindBestTarget(float teammateMod = 0f)
+    {
+        if (engagementTime < engagementThreshold) return target;
         prevTarget = target;
         UpdateThreats();
         List<AIAircraft> enemies = allAircraft.Where(a => a.team != this.team).ToList();
         AIAircraft bestTarget = null;
         float bestScore = float.MinValue;
 
-        // Engagement timer and threshold
-        float engagementThreshold = 5f; // Seconds before the AI starts penalizing the current target
 
-        // If AI is already engaged with a target, start tracking engagement time
-        if (target != null)
-        {
-            engagementTime += Time.deltaTime;
-        }
-
+        float maxDot = 0f;
         foreach (var enemy in enemies)
         {
             float score = 0;
-            if (enemy.transform == prevTarget) {
-                score -= 500;
-                    }
             // Prioritize enemies targeting us
             if (enemy.target == this.transform) score += 500;
 
@@ -163,16 +167,26 @@ public class AIAircraft : MonoBehaviour
                 score -= engagementTime - engagementThreshold;
             }
 
-            // Don't deprioritize enemies that teammates are already targeting
-            if (teammates.Any(t => t.target == enemy.transform)) score += 100;
+            if (teammates.Any(t => t.target == enemy.transform) && enemy.threats.Count<2) score += 100;
+
+            if (teammates.Any(t => t.threats.Contains(enemy))) score += 100 * teammateMod;
 
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            score += Mathf.Clamp(500 - distance, 0, 500); // Closer enemies have higher priority
+            score += Mathf.Clamp(1000 - distance / 2, 0, 1000); // Closer enemies have higher priority
+
+
+
+            // Dot Score (Most important)
+            Vector3 directionToAI = (transform.position - enemy.transform.position).normalized;
+            Vector3 enemyForward = enemy.transform.forward;
+            float dotProduct = Vector3.Dot(enemyForward, directionToAI);
+            score += dotProduct * 1000;
 
             // If this target has a higher score, set it as the best target
-            if (score > bestScore)
+            if (score > bestScore && enemy.team != team)
             {
                 bestScore = score;
+                if(enemy != target)
                 bestTarget = enemy;
             }
         }
@@ -183,8 +197,9 @@ public class AIAircraft : MonoBehaviour
             engagementTime = 0f;
         }
 
+        target = bestTarget.transform;
         // Return the best target found
-        return bestTarget?.transform;
+        return bestTarget.transform;
     }
 
 
@@ -213,7 +228,6 @@ public class AIAircraft : MonoBehaviour
     public void PerformEvasiveManeuver()
     {
         gun.Stop();
-        currentState = "Evasive Maneuver";
         if (target != null)
         {
             Vector3 enemyForward = target.forward;
@@ -241,7 +255,6 @@ public class AIAircraft : MonoBehaviour
             }
 
             aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed);
-            currentState = "Dogfighting";
         }
     }
 

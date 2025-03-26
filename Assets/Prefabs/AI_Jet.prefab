@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8688800493788408119}
+  - component: {fileID: 378778378529389688}
   - component: {fileID: 7606718037583856881}
   - component: {fileID: 6776174076210864544}
   - component: {fileID: 6626272941159241626}
@@ -41,6 +42,19 @@ Transform:
   - {fileID: 8207694482284588414}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &378778378529389688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3188691253854404300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7466523cf64c0304caa6a9fe8c4a291c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aircraft: {fileID: 7606718037583856881}
 --- !u!114 &7606718037583856881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59,7 +73,9 @@ MonoBehaviour:
   team: 0
   gun: {fileID: 7586731980186547350}
   aircraftMovement: {fileID: 6776174076210864544}
-  dotdot: 0
+  allAircraft: []
+  teammates: []
+  threats: []
 --- !u!114 &6776174076210864544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83,7 +99,7 @@ MonoBehaviour:
   emergencyAvoidanceDistance: 20
   dampingTime: 1
   stallHeight: 1000
-  stallPitchForce: 200
+  stallRecoveryForce: 0.7
 --- !u!136 &6626272941159241626
 CapsuleCollider:
   m_ObjectHideFlags: 0

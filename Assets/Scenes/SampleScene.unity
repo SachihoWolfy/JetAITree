@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -246,6 +245,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (3)
@@ -818,6 +821,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (6)
@@ -965,7 +972,7 @@ MonoBehaviour:
   Damping: 2
   SizeAdjustment: 2
   LateralAdjustment: 0
-  FovRange: {x: 1, y: 170.87411}
+  FovRange: {x: 3.4439392, y: 130.14186}
   DollyRange: {x: -100, y: 1000}
   OrthoSizeRange: {x: 1, y: 1000}
 --- !u!114 &460306789
@@ -1231,6 +1238,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (2)
@@ -1348,6 +1359,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (5)
@@ -1497,6 +1512,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (7)
@@ -2190,6 +2209,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (4)
@@ -2710,6 +2733,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet (1)
@@ -3261,6 +3288,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 378778378529389688, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
+      propertyPath: confidenceValue
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 3188691253854404300, guid: c8cb0902f92dd5f47854894466807b65, type: 3}
       propertyPath: m_Name
       value: AI_Jet

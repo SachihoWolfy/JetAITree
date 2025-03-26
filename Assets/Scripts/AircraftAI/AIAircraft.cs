@@ -34,17 +34,6 @@ public class AIAircraft : MonoBehaviour
         // Set up the behavior tree
         BTSelector root = new BTSelector();
 
-        // Add a branch for responding to teammates in danger
-        BTSelector teammateProtectionSelector = new BTSelector();
-        teammateProtectionSelector.AddChild(new BTCheckTeammateInDanger(this));
-        teammateProtectionSelector.AddChild(new BTProtectTeammate(this));
-
-        // Add a branch for responding to being engaged by a threat
-        BTSelector threatEngagementSelector = new BTSelector();
-        threatEngagementSelector.AddChild(new BTCheckIfBeingEngaged(this));
-        threatEngagementSelector.AddChild(new BTEngagePursuer(this)); // Implement the pursuit behavior
-        threatEngagementSelector.AddChild(teammateProtectionSelector);
-
         // Existing behavior
         BTSequence evadeSequence = new BTSequence();
         evadeSequence.AddChild(new BTEvasiveManeuver(this));
@@ -58,7 +47,6 @@ public class AIAircraft : MonoBehaviour
         // Root sequence: add the new branches
         root.AddChild(evadeSequence);
         root.AddChild(dogfightSequence);
-        root.AddChild(teammateProtectionSelector);
         root.AddChild(strafingSequence);
 
         behaviorTree = root;
@@ -243,9 +231,9 @@ public class AIAircraft : MonoBehaviour
         {
             Vector3 directionToTarget = (target.position - transform.position).normalized;
             float dotProduct = Vector3.Dot(transform.forward, directionToTarget);
-
+            float distanceToTarget = Vector3.Distance(transform.position, target.position);
             float threshold = 0.98f; // Adjust this value as needed
-            if (dotProduct >= threshold)
+            if (dotProduct >= threshold && distanceToTarget < 150f)
             {
                 gun.Play();
             }
@@ -265,6 +253,21 @@ public class AIAircraft : MonoBehaviour
         {
             Vector3 directionToGroundTarget = (groundTarget.position - transform.position).normalized;
             aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
+            Vector3 directionToTarget = (groundTarget.position - transform.position).normalized;
+            float dotProduct = Vector3.Dot(transform.forward, directionToTarget);
+            float distanceToTarget = Vector3.Distance(transform.position, groundTarget.position);
+            float threshold = 0.98f; // Adjust this value as needed
+            if (dotProduct >= threshold && distanceToTarget < 150f)
+            {
+                gun.Play();
+            }
+            else
+            {
+                gun.Stop();
+            }
+
+            aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed);
+            
         }
     }
 

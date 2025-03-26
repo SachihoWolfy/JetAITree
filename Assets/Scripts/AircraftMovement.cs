@@ -26,11 +26,16 @@ public class AircraftMovement : MonoBehaviour
 
     public float stallHeight = 1000f;  // Height at which the stall begins
     public float stallRecoveryForce = 0.7f; // Strength of downward guidance
+    public float groundAvoidHeight = 100f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         currentSpeed = minSpeed;
+    }
+    private void Update()
+    {
+        timeSinceReflect += Time.deltaTime;
     }
 
     public void MoveAircraft(Vector3 desiredDirection, float desiredSpeed)
@@ -43,6 +48,12 @@ public class AircraftMovement : MonoBehaviour
         {
             // Smoothly guide the nose downward instead of forcing a loop
             Vector3 correctedDirection = Vector3.Lerp(desiredDirection, Vector3.down, stallRecoveryForce);
+            desiredDirection = correctedDirection.normalized;
+        }
+        if (transform.position.y < groundAvoidHeight)
+        {
+            // Smoothly guide the nose downward instead of forcing a loop
+            Vector3 correctedDirection = Vector3.Lerp(desiredDirection, Vector3.up, stallRecoveryForce);
             desiredDirection = correctedDirection.normalized;
         }
 
@@ -123,18 +134,21 @@ public class AircraftMovement : MonoBehaviour
     {
         return currentSpeed;
     }
-
+    float timeSinceReflect;
     // OnCollisionEnter to reflect the aircraft on collision
     void OnCollisionStay(Collision collision)
     {
-        // Get the normal of the collision surface
-        Vector3 collisionNormal = collision.contacts[0].normal;
+        if(timeSinceReflect > 1f)
+        {
+            // Get the normal of the collision surface
+            Vector3 collisionNormal = collision.contacts[0].normal;
 
-        // Reflect the aircraft's velocity based on the collision normal
-        rb.velocity = Vector3.Reflect(rb.velocity, collisionNormal);
+            // Reflect the aircraft's velocity based on the collision normal
+            rb.velocity = Vector3.Reflect(rb.velocity, collisionNormal);
 
-        // Calculate the reflection of the aircraft's forward vector to adjust orientation
-        Quaternion reflectionRotation = Quaternion.FromToRotation(transform.forward, Vector3.Reflect(transform.forward, collisionNormal));
-        rb.MoveRotation(rb.rotation * reflectionRotation);
+            // Calculate the reflection of the aircraft's forward vector to adjust orientation
+            Quaternion reflectionRotation = Quaternion.FromToRotation(transform.forward, Vector3.Reflect(transform.forward, collisionNormal));
+            rb.MoveRotation(rb.rotation * reflectionRotation);
+        }
     }
 }

@@ -27,12 +27,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.15",
+      "version": "1.8.11",
       "depth": 2,
       "source": "registry",
       "dependencies": {
-        "com.unity.mathematics": "1.2.1",
-        "com.unity.modules.jsonserialize": "1.0.0"
+        "com.unity.mathematics": "1.2.1"
       },
       "url": "https://packages.unity.com"
     },
@@ -73,7 +72,7 @@
       "dependencies": {
         "com.unity.animation.rigging": "1.2.1",
         "com.unity.timeline": "1.7.6",
-        "com.unity.cinemachine": "2.10.0",
+        "com.unity.cinemachine": "2.9.5",
         "com.unity.formats.fbx": "4.2.1"
       }
     },
@@ -86,7 +85,7 @@
         "com.unity.sequences": "2.0.1",
         "com.unity.formats.fbx": "4.2.1",
         "com.unity.formats.alembic": "2.3.2",
-        "com.unity.cinemachine": "2.10.0",
+        "com.unity.cinemachine": "2.9.5",
         "com.unity.recorder": "4.0.2"
       }
     },
@@ -96,12 +95,12 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.ide.visualstudio": "2.0.22",
-        "com.unity.ide.rider": "3.0.28",
+        "com.unity.ide.rider": "3.0.27",
         "com.unity.ide.vscode": "1.2.5",
         "com.unity.editorcoroutines": "1.0.0",
         "com.unity.performance.profile-analyzer": "1.2.2",
         "com.unity.test-framework": "1.1.33",
-        "com.unity.testtools.codecoverage": "1.2.5"
+        "com.unity.testtools.codecoverage": "1.2.4"
       }
     },
     "com.unity.feature.gameplay-storytelling": {
@@ -109,9 +108,9 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.cinemachine": "2.10.0",
+        "com.unity.cinemachine": "2.9.5",
         "com.unity.timeline": "1.7.6",
-        "com.unity.visualscripting": "1.9.4"
+        "com.unity.visualscripting": "1.9.1"
       }
     },
     "com.unity.feature.worldbuilding": {
@@ -120,7 +119,7 @@
       "source": "builtin",
       "dependencies": {
         "com.unity.probuilder": "5.2.2",
-        "com.unity.polybrush": "1.1.6",
+        "com.unity.polybrush": "1.1.5",
         "com.unity.formats.fbx": "4.2.1",
         "com.unity.terrain-tools": "5.0.1"
       }
@@ -147,7 +146,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.28",
+      "version": "3.0.27",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -186,7 +185,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.polybrush": {
-      "version": "1.1.6",
+      "version": "1.1.5",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -234,7 +233,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.splines": {
-      "version": "2.6.0",
+      "version": "2.5.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -282,7 +281,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.testtools.codecoverage": {
-      "version": "1.2.5",
+      "version": "1.2.4",
       "depth": 1,
       "source": "registry",
       "dependencies": {

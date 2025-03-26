@@ -2,21 +2,23 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor;
 
-public class AITargetSelectionTree : MonoBehaviour
+public class TargetSelectionTree : MonoBehaviour
 {
     public AIAircraft aircraft;
     private BTSelector targetSelectionTree;
     public float safetyValue = 0.5f;
     public float confidenceValue = 0.5f;
+    private float maxDistance = 500f;
     private float maxSafety = 1.0f;
     private float maxConfidence = 1.0f;
-    private float safetyIncreaseRate = 0.1f;
+    private float safetyIncreaseRate = 0.05f;
     private float safetyDecayRate = 0.2f;
     private float confidenceIncreaseRate = 0.1f;
     private float confidenceDecayRate = 0.05f;
 
-    public string CurrentStatus = "Idle";
+    public string currentState = "Idle";
 
     private float timeSinceLastSwitch = 0.0f;
     private float targetSwitchDelay = 10.0f;
@@ -64,7 +66,7 @@ public class AITargetSelectionTree : MonoBehaviour
         {
             Vector3 directionToTarget = (aircraft.target.position - aircraft.transform.position).normalized;
             float dotProduct = Vector3.Dot(aircraft.transform.forward, directionToTarget);
-            if (dotProduct > 0.7f)
+            if (dotProduct > 0.8f)
             {
                 confidenceValue = Mathf.Clamp(confidenceValue + Time.deltaTime * confidenceIncreaseRate, 0f, maxConfidence);
             }
@@ -86,45 +88,56 @@ public class AITargetSelectionTree : MonoBehaviour
         // Keep Current Target Sequence
         BTSequence keepCurrentTarget = new BTSequence();
         keepCurrentTarget.AddChild(new BTCondition(() => aircraft.target != null && confidenceValue > 0.7f && safetyValue > 0.5f));
-        keepCurrentTarget.AddChild(new BTAction(() => { CurrentStatus = "Keeping Current Target"; }));
+        keepCurrentTarget.AddChild(new BTAction(() => { currentState = "Keeping Current Target"; }));
 
         // Switch Target Selector
         BTSelector switchTargetSelector = new BTSelector();
 
         // Switch to Pursuer Sequence
         BTSequence switchToPursuer = new BTSequence();
-        switchToPursuer.AddChild(new BTCondition(() => safetyValue < 0.3f));
+        switchToPursuer.AddChild(new BTCondition(() => safetyValue < 0.3f && CheckDistance(FindBestPursuer())));
         switchToPursuer.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestPursuer();
-            CurrentStatus = "Switching to Pursuer";
+            currentState = "Switching to Pursuer";
         }));
 
         // Switch to Threatening Teammate's Enemy Sequence
         BTSequence switchToThreateningTeammate = new BTSequence();
         switchToThreateningTeammate.AddChild(new BTCondition(() => GetLeastSafeTeammate() != null));
+        switchToThreateningTeammate.AddChild(new BTCondition(() => CheckDistance(FindThreateningEnemy(GetLeastSafeTeammate()))));
         switchToThreateningTeammate.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindThreateningEnemy(GetLeastSafeTeammate());
-            CurrentStatus = "Switching to Threatening Teammate's Enemy";
+            currentState = "Switching to Threatening Teammate's Enemy";
         }));
 
         // Switch to Best Target Sequence
         BTSequence switchToBestTarget = new BTSequence();
-        switchToBestTarget.AddChild(new BTCondition(() => aircraft.target == null || confidenceValue < 0.3f));
+        switchToBestTarget.AddChild(new BTCondition(() => (aircraft.target == null || confidenceValue < 0.3f) && CheckDistance(FindBestTarget())));
         switchToBestTarget.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestTarget();
-            CurrentStatus = "Switching to Best Target";
+            currentState = "Switching to Best Target";
         }));
 
         // Ensure Initial Target Sequence
-        BTSequence ensureInitialTarget = new BTSequence();
+        /*BTSequence ensureInitialTarget = new BTSequence();
         ensureInitialTarget.AddChild(new BTCondition(() => aircraft.target == null));
         ensureInitialTarget.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestTarget();
-            CurrentStatus = "Ensuring Initial Target";
+            currentState = "Ensuring Initial Target";
+        }));*/
+
+        // Ensure that no one on the enemy team is strafing.
+        BTSequence targetStrafers = new BTSequence();
+        targetStrafers.AddChild(new BTCondition(() => FindStrafingEnemy() != null));
+        targetStrafers.AddChild(new BTAction(() =>
+        {
+            timeSinceLastSwitch = 0.0f;
+            aircraft.target = FindStrafingEnemy();
+            currentState = "Defending Against Strafers";
         }));
 
         // Clear Target if Fully Safe Sequence
@@ -133,7 +146,7 @@ public class AITargetSelectionTree : MonoBehaviour
         clearTargetIfSafe.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = null;
-            CurrentStatus = "Clearing Target - Fully Safe";
+            currentState = "Clearing Target - Fully Safe";
         }));
 
         // Add sequences to selectors
@@ -141,30 +154,42 @@ public class AITargetSelectionTree : MonoBehaviour
         switchTargetSelector.AddChild(switchToPursuer);
         switchTargetSelector.AddChild(switchToThreateningTeammate);
         switchTargetSelector.AddChild(switchToBestTarget);
+        switchTargetSelector.AddChild(targetStrafers);
 
         // Combine selectors and sequences
         root.AddChild(manageTargetSelector);
         root.AddChild(switchTargetSelector);
-        root.AddChild(ensureInitialTarget);
+        //root.AddChild(ensureInitialTarget);
         root.AddChild(switchToThreateningTeammate);
         root.AddChild(clearTargetIfSafe);
 
         return root;
     }
 
-
-
+    float GetDistance(Transform target)
+    {
+        float distance = 1000000.0f;
+        if (target != null)
+        {
+            distance = Vector3.Distance(this.transform.position, target.transform.position);
+        }
+        return distance;
+    }
+    bool CheckDistance(Transform target)
+    {
+        return GetDistance(target) < maxDistance;
+    }
     private Transform FindBestPursuer()
     {
-        return aircraft.GetThreats().OrderByDescending(t => Vector3.Dot(t.transform.forward, (aircraft.transform.position - t.transform.position).normalized)).FirstOrDefault()?.transform;
+        return aircraft.threats.OrderByDescending(t => Vector3.Dot(t.transform.forward, (aircraft.transform.position - t.transform.position).normalized)).FirstOrDefault()?.transform;
     }
 
     private AIAircraft GetLeastSafeTeammate()
     {
         // Find the first teammate that is in danger or has a threat tied to them
         var leastSafeTeammate = aircraft.teammates
-            .Where(t => t.IsInDanger()) // Filter only teammates that are in danger
-            .OrderBy(t => t.GetThreats().Count) // Order by the number of threats tied to them (if any)
+            .Where(t => t.IsInDanger() && t.threats.Count>0) // Filter only teammates that are in danger
+            .OrderBy(t => t.threats.Count) // Order by the number of threats tied to them (if any)
             .FirstOrDefault(); // Get the first teammate in danger with threats (or null if none)
 
         return leastSafeTeammate; // Will return null if no teammates in danger or with threats
@@ -173,12 +198,55 @@ public class AITargetSelectionTree : MonoBehaviour
 
     private Transform FindThreateningEnemy(AIAircraft teammate)
     {
-        return aircraft.allAircraft.Where(a => a.team != aircraft.team && a.target == teammate.transform).FirstOrDefault().transform;
+        List<AIAircraft> enemies = aircraft.enemies;
+        AIAircraft potentialTarget = null;
+        if(enemies.Where(a => a.team != aircraft.team && a.target == teammate.transform).Count() < 1)
+        {
+            float maxEnemyConfidence = 0f;
+            foreach(var enemy in enemies)
+            {
+                float enemyConfidence = enemy.GetComponent<TargetSelectionTree>().confidenceValue;
+                if (enemyConfidence > maxEnemyConfidence)
+                {
+                    maxEnemyConfidence = enemyConfidence;
+                    potentialTarget = enemy;
+                }
+            }
+        }
+        else
+        {
+            potentialTarget = enemies.Where(a => a.team != aircraft.team && a.target == teammate.transform).First();
+        }
+        return potentialTarget.transform;
+    }
+    private Transform FindStrafingEnemy()
+    {
+        foreach (AIAircraft enemy in aircraft.enemies)
+        {
+            if (enemy.strafing)
+            {
+                return enemy.transform;
+            }
+        }
+        return null;
     }
 
     private Transform FindBestTarget()
     {
-        List<AIAircraft> enemies = aircraft.allAircraft.Where(a => a.team != aircraft.team).ToList();
-        return enemies.OrderByDescending(e => Vector3.Distance(aircraft.transform.position, e.transform.position)).FirstOrDefault().transform;
+        List<AIAircraft> enemies = aircraft.enemies;
+        Transform value = null;
+        try
+        {
+            value = enemies.OrderByDescending(e => Vector3.Distance(aircraft.transform.position, e.transform.position)).FirstOrDefault().transform;
+        }
+        catch { value = null; }
+        return value;
+    }
+    private void OnDrawGizmos()
+    {
+        if (Application.isPlaying)
+        {
+            Handles.Label(transform.position + Vector3.up * -3 + Vector3.right * 3, currentState);
+        }
     }
 }

@@ -10,6 +10,7 @@ public class AIAircraft : MonoBehaviour
     public string currentState = "Idle";
     public Team team;
     public ParticleSystem gun;
+    public bool strafing = false;
 
     public AircraftMovement aircraftMovement;
     private BTSelector behaviorTree;
@@ -20,6 +21,7 @@ public class AIAircraft : MonoBehaviour
     public List<AIAircraft> allAircraft;
     public Dictionary<AIAircraft, Transform> teamTargets = new Dictionary<AIAircraft, Transform>();
     public List<AIAircraft> teammates = new List<AIAircraft>();
+    public List<AIAircraft> enemies = new List<AIAircraft>();
     public List<AIAircraft> threats = new List<AIAircraft>();
 
     void Start()
@@ -50,15 +52,13 @@ public class AIAircraft : MonoBehaviour
         root.AddChild(strafingSequence);
 
         behaviorTree = root;
+        FindBestTarget();
     }
 
     void FixedUpdate()
     {
-        if (target == null)
-        {
-            target = FindBestTarget();
-        }
         UpdateTeammates();
+        UpdateEnemies();
         UpdateThreats();
         UpdateTeamTargets();
         behaviorTree.Execute();
@@ -67,10 +67,20 @@ public class AIAircraft : MonoBehaviour
 
     // ------------------ THREAT & TEAM AWARENESS ------------------
 
+    private void UpdateEnemies()
+    {
+        enemies.Clear();
+        enemies.AddRange(allAircraft);
+        foreach (var teammate in teammates) 
+        {
+            enemies.Remove(teammate);
+        }
+        enemies.Remove(this);
+    }
     private void UpdateThreats()
     {
         threats.Clear();
-        foreach (var enemy in allAircraft.Where(a => a.team != this.team))
+        foreach (var enemy in enemies)
         {
             if (enemy.target == this.transform)
             {
@@ -127,7 +137,7 @@ public class AIAircraft : MonoBehaviour
 
     public void TargetProtection()
     {
-        FindBestTarget(10f);
+        
     }
 
     float engagementTime;
@@ -185,7 +195,15 @@ public class AIAircraft : MonoBehaviour
             engagementTime = 0f;
         }
 
-        target = bestTarget.transform;
+        prevTarget = target;
+        try
+        {
+            target = bestTarget.transform;
+        }
+        catch
+        {
+            target = prevTarget;
+        }
         // Return the best target found
         return bestTarget.transform;
     }
@@ -215,6 +233,7 @@ public class AIAircraft : MonoBehaviour
 
     public void PerformEvasiveManeuver()
     {
+        strafing = false;
         gun.Stop();
         if (target != null)
         {
@@ -227,12 +246,13 @@ public class AIAircraft : MonoBehaviour
 
     public void EngageDogfight()
     {
+        strafing = false;
         if (target != null)
         {
             Vector3 directionToTarget = (target.position - transform.position).normalized;
             float dotProduct = Vector3.Dot(transform.forward, directionToTarget);
             float distanceToTarget = Vector3.Distance(transform.position, target.position);
-            float threshold = 0.98f; // Adjust this value as needed
+            float threshold = 0.98f;
             if (dotProduct >= threshold && distanceToTarget < 150f)
             {
                 gun.Play();
@@ -248,13 +268,13 @@ public class AIAircraft : MonoBehaviour
 
     public void PerformStrafingRun()
     {
+        strafing = true;
         currentState = "Strafing Run";
         if (groundTarget != null)
         {
             Vector3 directionToGroundTarget = (groundTarget.position - transform.position).normalized;
             aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
-            Vector3 directionToTarget = (groundTarget.position - transform.position).normalized;
-            float dotProduct = Vector3.Dot(transform.forward, directionToTarget);
+            float dotProduct = Vector3.Dot(transform.forward, directionToGroundTarget);
             float distanceToTarget = Vector3.Distance(transform.position, groundTarget.position);
             float threshold = 0.98f; // Adjust this value as needed
             if (dotProduct >= threshold && distanceToTarget < 150f)
@@ -266,7 +286,7 @@ public class AIAircraft : MonoBehaviour
                 gun.Stop();
             }
 
-            aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed);
+            aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
             
         }
     }
@@ -286,7 +306,7 @@ public class AIAircraft : MonoBehaviour
     {
         if (target == null) return false;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
-        if (distanceToTarget > 500f) return false;
+        if (distanceToTarget > 500f && !target.GetComponent<AIAircraft>().strafing) return false;
 
         if (Physics.Raycast(transform.position, (target.position - transform.position).normalized, out RaycastHit hit, distanceToTarget))
         {

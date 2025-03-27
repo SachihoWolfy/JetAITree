@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
+using System.Threading;
 
 public class CameraBehavior : MonoBehaviour
 {
@@ -94,6 +95,16 @@ public class CameraBehavior : MonoBehaviour
                     Radius = 1.5f
                 });
             }
+        }
+
+        if (curTarget.strafing && uniqueTargets.Add(curTarget.groundTarget))
+        {
+            group.Targets.Add(new CinemachineTargetGroup.Target
+            {
+                Object = curTarget.groundTarget.transform,
+                Weight = 0.9f,
+                Radius = 1.5f
+            });
         }
     }
 

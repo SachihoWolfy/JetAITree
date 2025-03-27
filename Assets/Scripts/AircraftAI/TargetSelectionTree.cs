@@ -22,6 +22,8 @@ public class TargetSelectionTree : MonoBehaviour
 
     private float timeSinceLastSwitch = 0.0f;
     private float targetSwitchDelay = 10.0f;
+
+    public TargetingStatus status;
     void Start()
     {
         aircraft = GetComponent<AIAircraft>();
@@ -88,7 +90,10 @@ public class TargetSelectionTree : MonoBehaviour
         // Keep Current Target Sequence
         BTSequence keepCurrentTarget = new BTSequence();
         keepCurrentTarget.AddChild(new BTCondition(() => aircraft.target != null && confidenceValue > 0.7f && safetyValue > 0.5f));
-        keepCurrentTarget.AddChild(new BTAction(() => { currentState = "Keeping Current Target"; }));
+        keepCurrentTarget.AddChild(new BTAction(() => { 
+            currentState = "Keeping Current Target";
+            status = TargetingStatus.KeepTarget;
+        }));
 
         // Switch Target Selector
         BTSelector switchTargetSelector = new BTSelector();
@@ -100,6 +105,7 @@ public class TargetSelectionTree : MonoBehaviour
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestPursuer();
             currentState = "Switching to Pursuer";
+            status = TargetingStatus.Pursuer;
         }));
 
         // Switch to Threatening Teammate's Enemy Sequence
@@ -110,6 +116,7 @@ public class TargetSelectionTree : MonoBehaviour
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindThreateningEnemy(GetLeastSafeTeammate());
             currentState = "Switching to Threatening Teammate's Enemy";
+            status = TargetingStatus.AllyDefense;
         }));
 
         // Switch to Best Target Sequence
@@ -119,6 +126,7 @@ public class TargetSelectionTree : MonoBehaviour
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestTarget();
             currentState = "Switching to Best Target";
+            status = TargetingStatus.Best;
         }));
 
         // Ensure Initial Target Sequence
@@ -138,6 +146,7 @@ public class TargetSelectionTree : MonoBehaviour
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindStrafingEnemy();
             currentState = "Defending Against Strafers";
+            status = TargetingStatus.Strafers;
         }));
 
         // Clear Target if Fully Safe Sequence
@@ -147,6 +156,7 @@ public class TargetSelectionTree : MonoBehaviour
             timeSinceLastSwitch = 0.0f;
             aircraft.target = null;
             currentState = "Clearing Target - Fully Safe";
+            status = TargetingStatus.Ground;
         }));
 
         // Add sequences to selectors

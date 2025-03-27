@@ -8,8 +8,11 @@ public class AIAircraft : MonoBehaviour
     public Transform target;
     public Transform groundTarget;
     public string currentState = "Idle";
+    public ManueverStatus status;
     public Team team;
     public ParticleSystem gun;
+    public AudioSource gunAudio;
+    public AudioSource brrtAudio;
     public bool strafing = false;
 
     public AircraftMovement aircraftMovement;
@@ -124,8 +127,7 @@ public class AIAircraft : MonoBehaviour
 
     public void Respawn()
     {
-        transform.position = initialPosition;
-        transform.rotation = initialRotation;
+        aircraftMovement.ResetAircraft(initialPosition, initialRotation);
         target = null;
         currentState = "Idle";
     }
@@ -137,7 +139,7 @@ public class AIAircraft : MonoBehaviour
 
     public void TargetProtection()
     {
-        
+        // NOPE.
     }
 
     float engagementTime;
@@ -189,7 +191,7 @@ public class AIAircraft : MonoBehaviour
             }
         }
 
-        // If the best target is different from the current one, reset the engagement timer
+        // If the best target is different from the current one, reset the engagement timer. PS: Going insane
         if (bestTarget != target)
         {
             engagementTime = 0f;
@@ -234,7 +236,13 @@ public class AIAircraft : MonoBehaviour
     public void PerformEvasiveManeuver()
     {
         strafing = false;
+        status = ManueverStatus.Evading;
         gun.Stop();
+        if (gunAudio.isPlaying)
+        {
+            brrtAudio.Play();
+        }
+        gunAudio.Stop();
         if (target != null)
         {
             Vector3 enemyForward = target.forward;
@@ -247,6 +255,7 @@ public class AIAircraft : MonoBehaviour
     public void EngageDogfight()
     {
         strafing = false;
+        status = ManueverStatus.Dogfighting;
         if (target != null)
         {
             Vector3 directionToTarget = (target.position - transform.position).normalized;
@@ -256,10 +265,20 @@ public class AIAircraft : MonoBehaviour
             if (dotProduct >= threshold && distanceToTarget < 150f)
             {
                 gun.Play();
+                if (!gunAudio.isPlaying)
+                {
+                    brrtAudio.Stop();
+                    gunAudio.Play();
+                }
             }
             else
             {
+                if (gunAudio.isPlaying)
+                {
+                    brrtAudio.Play();
+                }
                 gun.Stop();
+                gunAudio.Stop();
             }
 
             aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed);
@@ -270,6 +289,7 @@ public class AIAircraft : MonoBehaviour
     {
         strafing = true;
         currentState = "Strafing Run";
+        status = ManueverStatus.Strafing;
         if (groundTarget != null)
         {
             Vector3 directionToGroundTarget = (groundTarget.position - transform.position).normalized;
@@ -280,10 +300,20 @@ public class AIAircraft : MonoBehaviour
             if (dotProduct >= threshold && distanceToTarget < 150f)
             {
                 gun.Play();
+                if (!gunAudio.isPlaying)
+                {
+                    brrtAudio.Stop();
+                    gunAudio.Play();
+                }
             }
             else
             {
+                if (gunAudio.isPlaying)
+                {
+                    brrtAudio.Play();
+                }
                 gun.Stop();
+                gunAudio.Stop();
             }
 
             aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
@@ -293,6 +323,12 @@ public class AIAircraft : MonoBehaviour
 
     public void Patrol()
     {
+        if (gunAudio.isPlaying)
+        {
+            brrtAudio.Play();
+        }
+        gun.Stop();
+        gunAudio.Stop();
         currentState = "Patrolling";
         aircraftMovement.MoveAircraft(Vector3.forward, aircraftMovement.minSpeed);
     }
@@ -335,6 +371,14 @@ public class AIAircraft : MonoBehaviour
             Gizmos.color = Color.white;
             Gizmos.DrawWireSphere(transform.position, 1f);
             Handles.Label(transform.position + Vector3.up * 2, currentState);
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Damagable"))
+        {
+            collision.gameObject.GetComponent<AircraftStats>().TakeDamage(20);
+            GetComponent<AircraftStats>().TakeDamage(20);
         }
     }
 }

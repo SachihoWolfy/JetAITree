@@ -28,6 +28,9 @@ public class AircraftMovement : MonoBehaviour
     public float stallRecoveryForce = 0.7f; // Strength of downward guidance
     public float groundAvoidHeight = 100f;
 
+    public float pitchInput;
+    public float rollInput;
+    public float yawInput;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -73,27 +76,27 @@ public class AircraftMovement : MonoBehaviour
         // --- ROLL CONTROL ---
         float desiredYawAngle = Vector3.SignedAngle(transform.forward, desiredDirection, Vector3.up);
         Vector3 cross = Vector3.Cross(transform.forward, desiredDirection);
-        float rollDirection = Mathf.Sign(cross.y);
-        rollDirection = Mathf.SmoothDamp(rollInputDampingVelocity, rollDirection, ref rollInputDampingVelocity, dampingTime);
+        rollInput = Mathf.Sign(cross.y);
+        rollInput = Mathf.SmoothDamp(rollInputDampingVelocity, rollInput, ref rollInputDampingVelocity, dampingTime);
 
         // --- PITCH CONTROL ---
         Vector3 projectedTarget = Vector3.ProjectOnPlane(desiredDirection, transform.right);
         float pitchAngle = Vector3.SignedAngle(transform.forward, projectedTarget, transform.right);
-        float pitchInput = Mathf.Clamp(Mathf.Sign(pitchAngle), -1f, 1f);
+        pitchInput = Mathf.Clamp(Mathf.Sign(pitchAngle), -1f, 1f);
         pitchInput = Mathf.SmoothDamp(pitchInputDampingVelocity, pitchInput, ref pitchInputDampingVelocity, dampingTime);
 
         // --- YAW CONTROL ---
         float yawAngle = Vector3.SignedAngle(transform.forward, desiredDirection, Vector3.up);
-        float yawInput = Mathf.Clamp(Mathf.Sign(yawAngle), -1f, 1f);
+        yawInput = Mathf.Clamp(Mathf.Sign(yawAngle), -1f, 1f);
         yawInput = Mathf.SmoothDamp(yawInputDampingVelocity, yawInput, ref yawInputDampingVelocity, dampingTime);
 
         // Apply the damping to inputs
-        rollDirection *= maxRollSpeed * Time.fixedDeltaTime;
+        rollInput *= maxRollSpeed * Time.fixedDeltaTime;
         pitchInput *= maxPitchSpeed * Time.fixedDeltaTime;
         yawInput *= maxYawSpeed * Time.fixedDeltaTime;
 
         // Apply the rotation (pitch, yaw, and roll)
-        Quaternion deltaRotation = Quaternion.Euler(pitchInput, yawInput, rollDirection);
+        Quaternion deltaRotation = Quaternion.Euler(pitchInput, yawInput, rollInput);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
         // Apply forward velocity
@@ -150,5 +153,14 @@ public class AircraftMovement : MonoBehaviour
             Quaternion reflectionRotation = Quaternion.FromToRotation(transform.forward, Vector3.Reflect(transform.forward, collisionNormal));
             rb.MoveRotation(rb.rotation * reflectionRotation);
         }
+    }
+    public void ResetAircraft(Vector3 newPosition, Quaternion newRotation)
+    {
+        rb.position = newPosition;  // Use Rigidbody to move instantly
+        rb.rotation = newRotation;
+        rb.velocity = Vector3.zero;  // Stop all movement
+        rb.angularVelocity = Vector3.zero;
+
+        currentSpeed = minSpeed;  // Reset speed
     }
 }

@@ -56,7 +56,7 @@ public class AIAircraft : MonoBehaviour
         root.AddChild(strafingSequence);
 
         behaviorTree = root;
-        FindBestTarget();
+        target = null;
     }
 
     void FixedUpdate()
@@ -199,14 +199,6 @@ public class AIAircraft : MonoBehaviour
         }
 
         prevTarget = target;
-        try
-        {
-            target = bestTarget.transform;
-        }
-        catch
-        {
-            target = prevTarget;
-        }
         // Return the best target found
         return bestTarget.transform;
     }
@@ -244,9 +236,9 @@ public class AIAircraft : MonoBehaviour
             brrtAudio.Play();
         }
         gunAudio.Stop();
-        if (target != null)
+        if (threats[0] != null)
         {
-            Vector3 enemyForward = target.forward;
+            Vector3 enemyForward = threats[0].transform.forward;
             Vector3 evasiveDirection = Vector3.Cross(enemyForward, Vector3.up).normalized;
             float desiredSpeed = Mathf.Clamp(aircraftMovement.currentSpeed + 20f, aircraftMovement.minSpeed, aircraftMovement.maxSpeed);
             aircraftMovement.MoveAircraft(evasiveDirection, desiredSpeed);
@@ -343,7 +335,7 @@ public class AIAircraft : MonoBehaviour
     {
         if (target == null) return false;
         float distanceToTarget = Vector3.Distance(transform.position, target.position);
-        if (distanceToTarget > 500f && !target.GetComponent<AIAircraft>().strafing) return false;
+        if (distanceToTarget > 700f && !target.GetComponent<AIAircraft>().strafing) return false;
 
         if (Physics.Raycast(transform.position, (target.position - transform.position).normalized, out RaycastHit hit, distanceToTarget))
         {

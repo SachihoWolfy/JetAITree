@@ -122,7 +122,7 @@ public class TargetSelectionTree : MonoBehaviour
 
         // Switch to Best Target Sequence
         BTSequence switchToBestTarget = new BTSequence();
-        switchToBestTarget.AddChild(new BTCondition(() => (aircraft.target == null || confidenceValue < 0.3f) && CheckDistance(FindBestTarget())));
+        switchToBestTarget.AddChild(new BTCondition(() => (aircraft.target != null && CheckDistance(FindBestTarget()))));
         switchToBestTarget.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindBestTarget();
@@ -234,7 +234,7 @@ public class TargetSelectionTree : MonoBehaviour
     {
         foreach (AIAircraft enemy in aircraft.enemies)
         {
-            if (enemy.strafing)
+            if (enemy.strafing && enemy.threats.Count == 0)
             {
                 return enemy.transform;
             }
@@ -244,14 +244,7 @@ public class TargetSelectionTree : MonoBehaviour
 
     private Transform FindBestTarget()
     {
-        List<AIAircraft> enemies = aircraft.enemies;
-        Transform value = null;
-        try
-        {
-            value = enemies.OrderByDescending(e => Vector3.Distance(aircraft.transform.position, e.transform.position)).FirstOrDefault().transform;
-        }
-        catch { value = null; }
-        return value;
+        return aircraft.FindBestTarget();
     }
     private void OnDrawGizmos()
     {

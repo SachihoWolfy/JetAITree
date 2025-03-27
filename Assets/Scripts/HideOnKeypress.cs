@@ -19,7 +19,10 @@ public class HideOnKeypress : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(key))
+        {
+            ToggleVisibility();
+        }
     }
     void ToggleVisibility()
     {

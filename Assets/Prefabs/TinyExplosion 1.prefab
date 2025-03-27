@@ -4912,7 +4912,7 @@ GameObject:
   - component: {fileID: 198175801688348628}
   - component: {fileID: 199922078765427110}
   m_Layer: 0
-  m_Name: TinyExplosion
+  m_Name: TinyExplosion 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -27,6 +27,11 @@ public class InfoCanvasController : MonoBehaviour
     public List<TMP_Text> otherText = new List<TMP_Text>();
     public List<Image> otherImages = new List<Image>();
 
+    [Header("Score")]
+    public TMP_Text blueScoreText;
+    public TMP_Text redScoreText;
+    private int scoreBlue = 0;
+    private int scoreRed = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -159,6 +164,23 @@ public class InfoCanvasController : MonoBehaviour
             }
             curIndex++;
         }
+    }
+    public void AddKill(Team team)
+    {
+        if(team == Team.Red)
+        {
+            scoreBlue++;
+        }
+        else
+        {
+            scoreRed++;
+        }
+        UpdateScore();
+    }
+    void UpdateScore()
+    {
+        blueScoreText.text = scoreBlue.ToString();
+        redScoreText.text = scoreRed.ToString();
     }
 }
 

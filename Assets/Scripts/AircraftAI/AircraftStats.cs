@@ -9,26 +9,55 @@ public class AircraftStats : MonoBehaviour
     public GameObject explodePrefab;
 
     private AIAircraft aircraft;
+    private InfoCanvasController infoCanvasController;
+    public ParticleSystem smoke;
+    public ParticleSystem hitSystem;
+    private int maxHP;
+    private int criticalHP;
+    public bool invincible;
 
     void Start()
     {
         aircraft = GetComponent<AIAircraft>();
+        infoCanvasController = FindObjectOfType<InfoCanvasController>();
+        maxHP = hp;
+        criticalHP = hp / 4;
     }
-
+    void stopInvicibility()
+    {
+        invincible = false;
+    }
     public void TakeDamage(int damage)
     {
+        if (invincible)
+        {
+            return;
+        }
         hp -= damage;
-
+        hitSystem.Play();
         if (!hitAudio.isPlaying)
         {
             hitAudio.pitch = Random.Range(0.8f, 1.2f); // Randomize pitch between 0.8 and 1.2
             hitAudio.PlayOneShot(hitAudio.clip);
         }
+        if(hp <= criticalHP)
+        {
+            smoke.Play();
+        }
 
         if (hp <= 0)
         {
             Explode();
+            smoke.Stop();
+            infoCanvasController.AddKill(aircraft.team);
             Respawn();
+        }
+    }
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.CompareTag("Damagable"))
+        {
+            TakeDamage(20);
         }
     }
 
@@ -42,7 +71,9 @@ public class AircraftStats : MonoBehaviour
 
     void Respawn()
     {
+        invincible = true;
         aircraft.Respawn();
         hp = 20;
+        Invoke("stopInvicibility", 5f);
     }
 }

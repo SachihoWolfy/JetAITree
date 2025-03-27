@@ -50,7 +50,7 @@ public class StatusHud : MonoBehaviour
 
     private void UpdateManueverHUD()
     {
-        switch (manueverAI.status)
+        switch (manueverAI.m_status)
         {
             case ManueverStatus.Evading:
                 manueverImage.sprite = evadeSprite;

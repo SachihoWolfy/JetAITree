@@ -8,7 +8,8 @@ public class AIAircraft : MonoBehaviour
     public Transform target;
     public Transform groundTarget;
     public string currentState = "Idle";
-    public ManueverStatus status;
+    public ManueverStatus m_status;
+    public TargetingStatus t_status;
     public Team team;
     public ParticleSystem gun;
     public AudioSource gunAudio;
@@ -236,7 +237,7 @@ public class AIAircraft : MonoBehaviour
     public void PerformEvasiveManeuver()
     {
         strafing = false;
-        status = ManueverStatus.Evading;
+        m_status = ManueverStatus.Evading;
         gun.Stop();
         if (gunAudio.isPlaying)
         {
@@ -255,7 +256,7 @@ public class AIAircraft : MonoBehaviour
     public void EngageDogfight()
     {
         strafing = false;
-        status = ManueverStatus.Dogfighting;
+        m_status = ManueverStatus.Dogfighting;
         if (target != null)
         {
             Vector3 directionToTarget = (target.position - transform.position).normalized;
@@ -289,7 +290,7 @@ public class AIAircraft : MonoBehaviour
     {
         strafing = true;
         currentState = "Strafing Run";
-        status = ManueverStatus.Strafing;
+        m_status = ManueverStatus.Strafing;
         if (groundTarget != null)
         {
             Vector3 directionToGroundTarget = (groundTarget.position - transform.position).normalized;

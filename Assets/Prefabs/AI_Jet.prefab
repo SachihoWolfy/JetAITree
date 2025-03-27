@@ -846,9 +846,9 @@ MonoBehaviour:
   dogfightSprite: {fileID: 148992000, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
   strafingSprite: {fileID: 1249911487, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
   keepTargetSprite: {fileID: 334207661, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
-  pursuerSprite: {fileID: 573579947, guid: d884df71fc2ae5a4f914e9691fc8d03a, type: 3}
+  pursuerSprite: {fileID: 334701891, guid: d884df71fc2ae5a4f914e9691fc8d03a, type: 3}
   allyDefendSprite: {fileID: 1943950751, guid: e8b5fae8387bd334bacc417d28419195, type: 3}
-  bestSprite: {fileID: 114523433, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
+  bestSprite: {fileID: -1298851884, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
   straferSprite: {fileID: 21300000, guid: 74002545d0a5dc948a26c98e3a02e0a8, type: 3}
   groundSprite: {fileID: -971976402, guid: 0a531de1427d32c4caacea58fbfe7518, type: 3}
 --- !u!136 &6626272941159241626

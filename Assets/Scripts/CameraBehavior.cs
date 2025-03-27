@@ -12,7 +12,7 @@ public class CameraBehavior : MonoBehaviour
 
     private bool backInput;
     private bool nextInput;
-    private AIAircraft curTarget;
+    public AIAircraft curTarget;
     private int targetIndex = 0;
 
     void Start()

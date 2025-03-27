@@ -32,6 +32,7 @@ public class TargetSelectionTree : MonoBehaviour
 
     void FixedUpdate()
     {
+        aircraft.t_status = status;
         UpdateSafetyAndConfidence();
         // Update time since last target switch
         timeSinceLastSwitch += Time.deltaTime;

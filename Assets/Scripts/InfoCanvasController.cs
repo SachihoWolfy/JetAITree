@@ -32,6 +32,11 @@ public class InfoCanvasController : MonoBehaviour
     public TMP_Text redScoreText;
     private int scoreBlue = 0;
     private int scoreRed = 0;
+
+    [Header("Spectating")]
+    public TMP_Text nameText;
+    public Image pilotImage;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +52,7 @@ public class InfoCanvasController : MonoBehaviour
         t_status = aircraft.t_status;
         UpdateTargetTree();
         UpdateManueverTree();
+        UpdateSpectate();
     }
 
     void UpdateTargetTree()
@@ -181,6 +187,20 @@ public class InfoCanvasController : MonoBehaviour
     {
         blueScoreText.text = scoreBlue.ToString();
         redScoreText.text = scoreRed.ToString();
+    }
+    void UpdateSpectate()
+    {
+        nameText.text = aircraft.aircraftID;
+        if (aircraft.team == Team.Red)
+        {
+            nameText.color = redScoreText.color;
+            pilotImage.color = redScoreText.color;
+        }
+        else
+        {
+            nameText.color = blueScoreText.color;
+            pilotImage.color = blueScoreText.color;
+        }
     }
 }
 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class StatusHud : MonoBehaviour
 {
@@ -24,6 +25,10 @@ public class StatusHud : MonoBehaviour
     public Sprite bestSprite;
     public Sprite straferSprite;
     public Sprite groundSprite;
+
+    public TMP_Text aircraftName;
+    public Image pilotImage;
+    public string aircraftId;
     // Start is called before the first frame update
     void Start()
     {
@@ -33,12 +38,20 @@ public class StatusHud : MonoBehaviour
         {
             manueverImage.color = redColor;
             targetImage.color = redColor;
+            aircraftName.color = redColor;
+            pilotImage.color = redColor;
         }
         else
         {
             manueverImage.color = blueColor;
             targetImage.color = blueColor;
+            aircraftName.color = blueColor;
+            pilotImage.color = blueColor;
         }
+        aircraftId = NVJOBNameGen.GiveAName(3);
+        aircraftName.text = aircraftId;
+        gameObject.name = aircraftId;
+        manueverAI.aircraftID = aircraftId;
     }
 
     // Update is called once per frame

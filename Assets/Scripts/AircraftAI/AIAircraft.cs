@@ -27,11 +27,18 @@ public class AIAircraft : MonoBehaviour
     public List<AIAircraft> teammates = new List<AIAircraft>();
     public List<AIAircraft> enemies = new List<AIAircraft>();
     public List<AIAircraft> threats = new List<AIAircraft>();
+    private float timeSinceLastSwitch = 0.0f;
+    private float targetSwitchDelay = 10.0f;
+    private bool doEratic;
+    private TargetSelectionTree t_tree;
+
+    public string aircraftID = "";
 
     void Start()
     {
         allAircraft.AddRange(FindObjectsOfType<AIAircraft>());
         aircraftMovement = GetComponent<AircraftMovement>();
+        t_tree = GetComponent<TargetSelectionTree>();
 
         // Store initial position and rotation for respawning
         initialPosition = transform.position;
@@ -67,6 +74,10 @@ public class AIAircraft : MonoBehaviour
         UpdateTeamTargets();
         behaviorTree.Execute();
         engagementTime += Time.deltaTime;
+        timeSinceLastSwitch += Time.deltaTime;
+
+        doEratic = t_tree.confidenceValue > 0.6f;
+
     }
 
     // ------------------ THREAT & TEAM AWARENESS ------------------
@@ -146,7 +157,7 @@ public class AIAircraft : MonoBehaviour
     }
 
     float engagementTime;
-    float engagementThreshold = 5f; // Seconds before the AI starts penalizing the current target
+    float engagementThreshold = 5f; 
     Transform prevTarget;
     public Transform FindBestTarget(float teammateMod = 0f)
     {
@@ -156,9 +167,6 @@ public class AIAircraft : MonoBehaviour
         List<AIAircraft> enemies = allAircraft.Where(a => a.team != this.team).ToList();
         AIAircraft bestTarget = null;
         float bestScore = float.MinValue;
-
-
-        float maxDot = 0f;
         foreach (var enemy in enemies)
         {
             float score = 0;
@@ -270,8 +278,7 @@ public class AIAircraft : MonoBehaviour
                 gun.Stop();
                 gunAudio.Stop();
             }
-
-            aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed);
+            aircraftMovement.MoveAircraft(directionToTarget, aircraftMovement.maxSpeed, false, doEratic);
         }
     }
 

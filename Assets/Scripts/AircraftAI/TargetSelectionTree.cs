@@ -16,7 +16,7 @@ public class TargetSelectionTree : MonoBehaviour
     private float safetyIncreaseRate = 0.05f;
     private float safetyDecayRate = 0.2f;
     private float confidenceIncreaseRate = 0.1f;
-    private float confidenceDecayRate = 0.1f;
+    private float confidenceDecayRate = 0.05f;
 
     public string currentState = "Idle";
 
@@ -71,7 +71,7 @@ public class TargetSelectionTree : MonoBehaviour
         {
             Vector3 directionToTarget = (aircraft.target.position - aircraft.transform.position).normalized;
             float dotProduct = Vector3.Dot(aircraft.transform.forward, directionToTarget);
-            if (dotProduct > 0.8f)
+            if (dotProduct > 0.8f && CheckDistance(aircraft.target))
             {
                 confidenceValue = Mathf.Clamp(confidenceValue + Time.deltaTime * confidenceIncreaseRate, 0f, maxConfidence);
             }

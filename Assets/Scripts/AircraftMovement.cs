@@ -104,7 +104,6 @@ public class AircraftMovement : MonoBehaviour
         simulatedYawInput = Mathf.SmoothDamp(yawInputDampingVelocity, simulatedYawInput, ref yawInputDampingVelocity, dampingTime);
         simulatedYawInput *= inputScale * maxYawSpeed * Time.fixedDeltaTime;
 
-        // Simulate the rotation
         Quaternion simulatedDeltaRotation = Quaternion.Euler(simulatedPitchInput, simulatedYawInput, simulatedRollInput);
         Vector3 simulatedNewDirection = simulatedDeltaRotation * transform.forward;
 
@@ -144,41 +143,36 @@ public class AircraftMovement : MonoBehaviour
         float angleToDesiredDirection = Vector3.Angle(transform.forward, desiredDirection);
         float inputScale = doInputScaling ? Mathf.InverseLerp(0f, 2.5f, angleToDesiredDirection) : 1f;
 
-        // --- ROLL CONTROL (More Aggressive) ---
+        // --- ROLL CONTROL ---
         Vector3 localCross = Vector3.Cross(Vector3.forward, localTargetDir);
         rollInput = -Mathf.Sign(localCross.y);
 
-        // Reduce damping to allow sharper roll input
         rollInput = Mathf.SmoothDamp(rollInputDampingVelocity, rollInput * 1.5f, ref rollInputDampingVelocity, dampingTime * 0.75f);
         rollInput = Mathf.Clamp(rollInput, -1f, 1f);
         rollInput *= maxRollSpeed * Time.fixedDeltaTime * inputScale;
 
-        // --- PITCH CONTROL (Prioritize if Target is in Front) ---
+        // --- PITCH CONTROL ---
         Vector3 localProjectedTarget = Vector3.ProjectOnPlane(localTargetDir, Vector3.right);
         float pitchAngle = Vector3.SignedAngle(Vector3.forward, localProjectedTarget, Vector3.right);
 
-        // Prioritize pitch more aggressively when the target is in front
         float pitchMultiplier = (angleToDesiredDirection < 30f) ? 1.2f : 1f;
         pitchInput = Mathf.Clamp(pitchAngle / 30f, -1f, 1f);
         pitchInput = Mathf.SmoothDamp(pitchInputDampingVelocity, pitchInput * pitchMultiplier, ref pitchInputDampingVelocity, dampingTime * 0.75f);
 
         pitchInput *= maxPitchSpeed * Time.fixedDeltaTime * inputScale;
 
-        // --- YAW CONTROL (Sharpen Turns when Needed) ---
+        // --- YAW CONTROL ---
         float yawAngle = Vector3.SignedAngle(Vector3.forward, localTargetDir, Vector3.up);
 
-        // If target is far to the side, prioritize yaw for faster tracking
         float yawWeight = (Mathf.Abs(yawAngle) > 60f) ? 1.5f : 1f;
         yawInput = Mathf.Clamp(yawAngle / 30f, -1f, 1f);
         yawInput = Mathf.SmoothDamp(yawInputDampingVelocity, yawInput * yawWeight, ref yawInputDampingVelocity, dampingTime * 0.75f);
 
         yawInput *= maxYawSpeed * Time.fixedDeltaTime * inputScale;
 
-        // Apply the rotation based on the adjusted inputs
         Quaternion deltaRotation = Quaternion.Euler(pitchInput, yawInput, rollInput);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
-        // Set the velocity based on the current speed
         rb.velocity = transform.forward * currentSpeed;
     }
 
@@ -219,7 +213,7 @@ public class AircraftMovement : MonoBehaviour
         // --- ROLL CONTROL ---
         float desiredYawAngle = Vector3.SignedAngle(transform.forward, desiredDirection, Vector3.up);
         Vector3 cross = Vector3.Cross(transform.forward, desiredDirection);
-        rollInput = Mathf.Sign(cross.y); // Back to the original roll direction
+        rollInput = Mathf.Sign(cross.y); 
         rollInput = Mathf.SmoothDamp(rollInputDampingVelocity, rollInput, ref rollInputDampingVelocity, dampingTime);
 
         // Apply input scaling
@@ -240,11 +234,9 @@ public class AircraftMovement : MonoBehaviour
 
         yawInput *= inputScale * maxYawSpeed * Time.fixedDeltaTime;
 
-        // Apply the rotation based on the adjusted inputs
         Quaternion deltaRotation = Quaternion.Euler(pitchInput, yawInput, rollInput);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
-        // Set the velocity based on the current speed
         rb.velocity = transform.forward * currentSpeed;
     }
 
@@ -275,14 +267,14 @@ public class AircraftMovement : MonoBehaviour
         // --- TEAMMATE AVOIDANCE ---
         foreach (AIAircraft teammate in teammates)
         {
-            if (teammate == this) continue; // Skip self
+            if (teammate == this) continue; 
 
             Vector3 toTeammate = teammate.transform.position - transform.position;
             float distance = toTeammate.magnitude;
 
-            if (distance < emergencyAvoidanceDistance) // If within avoidance range
+            if (distance < emergencyAvoidanceDistance)
             {
-                float weight = Mathf.InverseLerp(collisionAvoidanceDistance, 0, distance); // Closer = stronger repulsion
+                float weight = Mathf.InverseLerp(collisionAvoidanceDistance, 0, distance);
                 avoidanceVector += -toTeammate.normalized * weight;
             }
         }

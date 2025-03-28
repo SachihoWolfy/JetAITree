@@ -825,7 +825,7 @@ MonoBehaviour:
   maxYawSpeed: 120
   collisionAvoidanceDistance: 50
   emergencyAvoidanceDistance: 20
-  dampingTime: 1
+  dampingTime: 0.3
   stallHeight: 1000
   stallRecoveryForce: 0.7
   groundAvoidHeight: 100

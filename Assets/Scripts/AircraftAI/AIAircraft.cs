@@ -160,7 +160,7 @@ public class AIAircraft : MonoBehaviour
         foreach (var enemy in enemies)
         {
             float score = 0;
-            // Prioritize enemies targeting us
+
             if (enemy.target == this.transform) score += 500;
 
             if(enemy == target && engagementTime > engagementThreshold)
@@ -173,17 +173,13 @@ public class AIAircraft : MonoBehaviour
             if (teammates.Any(t => t.threats.Contains(enemy))) score += 100 * teammateMod;
 
             float distance = Vector3.Distance(transform.position, enemy.transform.position);
-            score += Mathf.Clamp(1000 - distance / 2, 0, 1000); // Closer enemies have higher priority
+            score += Mathf.Clamp(1000 - distance / 2, 0, 1000); 
 
-
-
-            // Dot Score (Most important)
             Vector3 directionToAI = (transform.position - enemy.transform.position).normalized;
             Vector3 enemyForward = enemy.transform.forward;
             float dotProduct = Vector3.Dot(enemyForward, directionToAI);
             score += dotProduct * 1000;
 
-            // If this target has a higher score, set it as the best target
             if (score > bestScore && enemy.team != team)
             {
                 bestScore = score;
@@ -199,15 +195,14 @@ public class AIAircraft : MonoBehaviour
         }
 
         prevTarget = target;
-        // Return the best target found
         return bestTarget.transform;
     }
 
 
 
-    public void MoveAircraft(Vector3 direction, float desiredSpeed)
+    public void MoveAircraft(Vector3 direction, float desiredSpeed, bool doInputScaling = false)
     {
-        aircraftMovement.MoveAircraft(direction, desiredSpeed);
+        aircraftMovement.MoveAircraft(direction, desiredSpeed, doInputScaling);
     }
 
     public bool IsInDanger()
@@ -283,14 +278,19 @@ public class AIAircraft : MonoBehaviour
         strafing = true;
         currentState = "Strafing Run";
         m_status = ManueverStatus.Strafing;
+
         if (groundTarget != null)
         {
             Vector3 directionToGroundTarget = (groundTarget.position - transform.position).normalized;
-            aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
-            float dotProduct = Vector3.Dot(transform.forward, directionToGroundTarget);
             float distanceToTarget = Vector3.Distance(transform.position, groundTarget.position);
-            float threshold = 0.98f; // Adjust this value as needed
-            if (dotProduct >= threshold && distanceToTarget < 150f)
+
+            float targetSpeed = Mathf.Clamp(distanceToTarget / 2f, aircraftMovement.minSpeed, aircraftMovement.maxSpeed); 
+            aircraftMovement.MoveAircraft(directionToGroundTarget, targetSpeed);
+
+            float dotProduct = Vector3.Dot(transform.forward, directionToGroundTarget);
+            float threshold = 0.98f;
+
+            if (dotProduct >= threshold && distanceToTarget < 200f)
             {
                 gun.Play();
                 if (!gunAudio.isPlaying)
@@ -308,11 +308,9 @@ public class AIAircraft : MonoBehaviour
                 gun.Stop();
                 gunAudio.Stop();
             }
-
-            aircraftMovement.MoveAircraft(directionToGroundTarget, aircraftMovement.maxSpeed);
-            
         }
     }
+
 
     public void Patrol()
     {

@@ -29,6 +29,12 @@ public class AircraftMovement : MonoBehaviour
     public float pitchInput;
     public float rollInput;
     public float yawInput;
+
+    // Add PID controllers for each axis
+    private PIDController rollPID = new PIDController(1.0f, 0.1f, 0.05f);  // Example values
+    private PIDController pitchPID = new PIDController(1.0f, 0.1f, 0.05f);
+    private PIDController yawPID = new PIDController(1.0f, 0.1f, 0.05f);
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -39,7 +45,7 @@ public class AircraftMovement : MonoBehaviour
         timeSinceReflect += Time.deltaTime;
     }
 
-    public void MoveAircraft(Vector3 desiredDirection, float desiredSpeed)
+    public void MoveAircraft(Vector3 desiredDirection, float desiredSpeed, bool doInputScaling = false)
     {
         desiredSpeed = Mathf.Clamp(desiredSpeed, minSpeed, maxSpeed);
 
@@ -67,11 +73,23 @@ public class AircraftMovement : MonoBehaviour
         // --- MOVEMENT CONTROL ---
         Vector3 localTargetDir = transform.InverseTransformDirection(desiredDirection);
 
+        // --- ANGLE CONTROL (for damping) ---
+        float angleToDesiredDirection = Vector3.Angle(transform.forward, desiredDirection);
+
+        // Only reduce input when the angle is small
+        float inputScale = Mathf.InverseLerp(0f, 2.5f, angleToDesiredDirection);
+
+        //if (!doInputScaling) { inputScale = 1f; }
+
         // --- ROLL CONTROL ---
         float desiredYawAngle = Vector3.SignedAngle(transform.forward, desiredDirection, Vector3.up);
         Vector3 cross = Vector3.Cross(transform.forward, desiredDirection);
         rollInput = Mathf.Sign(cross.y);
         rollInput = Mathf.SmoothDamp(rollInputDampingVelocity, rollInput, ref rollInputDampingVelocity, dampingTime);
+
+        // Apply input scaling to reduce response when almost aligned
+        rollInput *= inputScale;
+        rollInput *= maxRollSpeed * Time.fixedDeltaTime;
 
         // --- PITCH CONTROL ---
         Vector3 projectedTarget = Vector3.ProjectOnPlane(desiredDirection, transform.right);
@@ -79,20 +97,34 @@ public class AircraftMovement : MonoBehaviour
         pitchInput = Mathf.Clamp(Mathf.Sign(pitchAngle), -1f, 1f);
         pitchInput = Mathf.SmoothDamp(pitchInputDampingVelocity, pitchInput, ref pitchInputDampingVelocity, dampingTime);
 
+        // Apply input scaling to reduce response when almost aligned
+        pitchInput *= inputScale;
+        pitchInput *= maxPitchSpeed * Time.fixedDeltaTime;
+
         // --- YAW CONTROL ---
         float yawAngle = Vector3.SignedAngle(transform.forward, desiredDirection, Vector3.up);
         yawInput = Mathf.Clamp(Mathf.Sign(yawAngle), -1f, 1f);
         yawInput = Mathf.SmoothDamp(yawInputDampingVelocity, yawInput, ref yawInputDampingVelocity, dampingTime);
 
-        rollInput *= maxRollSpeed * Time.fixedDeltaTime;
-        pitchInput *= maxPitchSpeed * Time.fixedDeltaTime;
+        // Apply input scaling to reduce response when almost aligned
+        yawInput *= inputScale;
         yawInput *= maxYawSpeed * Time.fixedDeltaTime;
 
+        // Apply the rotation based on the adjusted inputs
         Quaternion deltaRotation = Quaternion.Euler(pitchInput, yawInput, rollInput);
         rb.MoveRotation(rb.rotation * deltaRotation);
 
+        // Set the velocity based on the current speed
         rb.velocity = transform.forward * currentSpeed;
     }
+
+
+
+
+
+
+
+
 
 
     private Vector3 AvoidObstacles()

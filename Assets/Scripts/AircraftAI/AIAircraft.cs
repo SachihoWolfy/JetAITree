@@ -345,7 +345,7 @@ public class AIAircraft : MonoBehaviour
         float targetAltitude = target.position.y;
         return targetAltitude >= 0f && targetAltitude <= 10000f;
     }
-
+    /*
     void OnDrawGizmos()
     {
         if (Application.isPlaying)
@@ -366,6 +366,7 @@ public class AIAircraft : MonoBehaviour
             Handles.Label(transform.position + Vector3.up * 2, currentState);
         }
     }
+    */
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Damagable"))

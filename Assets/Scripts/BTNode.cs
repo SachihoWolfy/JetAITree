@@ -2,6 +2,8 @@ public abstract class BTNode
 {
     public abstract bool Execute();
 }
+
+// These System things are cool, I need to use them more often. Having seperate files for seperate things SUCKS.
 public class BTCondition : BTNode
 {
     private System.Func<bool> condition;

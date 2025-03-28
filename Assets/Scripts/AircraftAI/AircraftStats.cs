@@ -37,7 +37,7 @@ public class AircraftStats : MonoBehaviour
         hitSystem.Play();
         if (!hitAudio.isPlaying)
         {
-            hitAudio.pitch = Random.Range(0.8f, 1.2f); // Randomize pitch between 0.8 and 1.2
+            hitAudio.pitch = Random.Range(0.8f, 1.2f);
             hitAudio.PlayOneShot(hitAudio.clip);
         }
         if(hp <= criticalHP)

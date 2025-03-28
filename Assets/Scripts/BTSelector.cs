@@ -10,7 +10,7 @@ public class BTSelector : BTNode
     {
         foreach (var node in children)
         {
-            if (node.Execute()) return true; // Succeed on first successful child
+            if (node.Execute()) return true;
         }
         return false;
     }

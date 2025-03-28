@@ -34,10 +34,8 @@ public class TargetSelectionTree : MonoBehaviour
     {
         aircraft.t_status = status;
         UpdateSafetyAndConfidence();
-        // Update time since last target switch
         timeSinceLastSwitch += Time.deltaTime;
 
-        // Only execute the tree if the cooldown period has passed
         if (timeSinceLastSwitch >= targetSwitchDelay)
         {
             targetSelectionTree.Execute();
@@ -83,6 +81,7 @@ public class TargetSelectionTree : MonoBehaviour
 
     private BTSelector BuildTargetSelectionTree()
     {
+        // Lets lay this out. First the root.
         BTSelector root = new BTSelector();
 
         // Manage Target Selector
@@ -90,7 +89,7 @@ public class TargetSelectionTree : MonoBehaviour
 
         // Keep Current Target Sequence
         BTSequence keepCurrentTarget = new BTSequence();
-        keepCurrentTarget.AddChild(new BTCondition(() => aircraft.target != null && confidenceValue > 0.7f && safetyValue > 0.5f));
+        keepCurrentTarget.AddChild(new BTCondition(() => (aircraft.target != null && confidenceValue > 0.7f && safetyValue > 0.5f) || FindBestTarget() == aircraft.target));
         keepCurrentTarget.AddChild(new BTAction(() => { 
             currentState = "Keeping Current Target";
             status = TargetingStatus.KeepTarget;
@@ -130,15 +129,6 @@ public class TargetSelectionTree : MonoBehaviour
             status = TargetingStatus.Best;
         }));
 
-        // Ensure Initial Target Sequence
-        /*BTSequence ensureInitialTarget = new BTSequence();
-        ensureInitialTarget.AddChild(new BTCondition(() => aircraft.target == null));
-        ensureInitialTarget.AddChild(new BTAction(() => {
-            timeSinceLastSwitch = 0.0f;
-            aircraft.target = FindBestTarget();
-            currentState = "Ensuring Initial Target";
-        }));*/
-
         // Ensure that no one on the enemy team is strafing.
         BTSequence targetStrafers = new BTSequence();
         targetStrafers.AddChild(new BTCondition(() => FindStrafingEnemy() != null));
@@ -167,10 +157,9 @@ public class TargetSelectionTree : MonoBehaviour
         switchTargetSelector.AddChild(switchToBestTarget);
         switchTargetSelector.AddChild(targetStrafers);
 
-        // Combine selectors and sequences
+        // Combine selectors and sequences. This is the tree. Hecc yeah!
         root.AddChild(manageTargetSelector);
         root.AddChild(switchTargetSelector);
-        //root.AddChild(ensureInitialTarget);
         root.AddChild(switchToThreateningTeammate);
         root.AddChild(clearTargetIfSafe);
 
@@ -197,13 +186,12 @@ public class TargetSelectionTree : MonoBehaviour
 
     private AIAircraft GetLeastSafeTeammate()
     {
-        // Find the first teammate that is in danger or has a threat tied to them
         var leastSafeTeammate = aircraft.teammates
-            .Where(t => t.IsInDanger() && t.threats.Count>0) // Filter only teammates that are in danger
-            .OrderBy(t => t.threats.Count) // Order by the number of threats tied to them (if any)
-            .FirstOrDefault(); // Get the first teammate in danger with threats (or null if none)
+            .Where(t => t.IsInDanger() && t.threats.Count>0) 
+            .OrderBy(t => t.threats.Count)
+            .FirstOrDefault(); 
 
-        return leastSafeTeammate; // Will return null if no teammates in danger or with threats
+        return leastSafeTeammate; 
     }
 
 
@@ -244,8 +232,14 @@ public class TargetSelectionTree : MonoBehaviour
 
     private Transform FindBestTarget()
     {
-        return aircraft.FindBestTarget();
+        var target = aircraft.FindBestTarget();
+        if (target == null)
+        {
+            return target;
+        }
+        return target.transform;
     }
+    /*
     private void OnDrawGizmos()
     {
         if (Application.isPlaying)
@@ -253,4 +247,5 @@ public class TargetSelectionTree : MonoBehaviour
             Handles.Label(transform.position + Vector3.up * -3 + Vector3.right * 3, currentState);
         }
     }
+    */
 }

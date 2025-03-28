@@ -16,12 +16,14 @@ public class TargetSelectionTree : MonoBehaviour
     private float safetyIncreaseRate = 0.05f;
     private float safetyDecayRate = 0.2f;
     private float confidenceIncreaseRate = 0.1f;
-    private float confidenceDecayRate = 0.05f;
+    private float confidenceDecayRate = 0.1f;
 
     public string currentState = "Idle";
 
     private float timeSinceLastSwitch = 0.0f;
     private float targetSwitchDelay = 10.0f;
+
+    private AIAircraft targetAI;
 
     public TargetingStatus status;
     void Start()
@@ -39,6 +41,8 @@ public class TargetSelectionTree : MonoBehaviour
         if (timeSinceLastSwitch >= targetSwitchDelay)
         {
             targetSelectionTree.Execute();
+            if(aircraft.target!=null)
+            targetAI = aircraft.target.GetComponent<AIAircraft>();
         }
     }
 
@@ -89,7 +93,7 @@ public class TargetSelectionTree : MonoBehaviour
 
         // Keep Current Target Sequence
         BTSequence keepCurrentTarget = new BTSequence();
-        keepCurrentTarget.AddChild(new BTCondition(() => (aircraft.target != null && confidenceValue > 0.7f && safetyValue > 0.5f) || FindBestTarget() == aircraft.target));
+        keepCurrentTarget.AddChild(new BTCondition(() => ((aircraft.target != null && confidenceValue > 0.8f && safetyValue > 0.5f) || FindBestTarget() == aircraft.target) && (targetAI.threats.Count() <= 3)));
         keepCurrentTarget.AddChild(new BTAction(() => { 
             currentState = "Keeping Current Target";
             status = TargetingStatus.KeepTarget;
@@ -111,7 +115,7 @@ public class TargetSelectionTree : MonoBehaviour
         // Switch to Threatening Teammate's Enemy Sequence
         BTSequence switchToThreateningTeammate = new BTSequence();
         switchToThreateningTeammate.AddChild(new BTCondition(() => GetLeastSafeTeammate() != null));
-        switchToThreateningTeammate.AddChild(new BTCondition(() => CheckDistance(FindThreateningEnemy(GetLeastSafeTeammate()))));
+        switchToThreateningTeammate.AddChild(new BTCondition(() => CheckDistance(FindThreateningEnemy(GetLeastSafeTeammate()))||GetLeastSafeTeammate().threats.Count>2));
         switchToThreateningTeammate.AddChild(new BTAction(() => {
             timeSinceLastSwitch = 0.0f;
             aircraft.target = FindThreateningEnemy(GetLeastSafeTeammate());

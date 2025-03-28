@@ -97,11 +97,13 @@ public class AIAircraft : MonoBehaviour
         teammates.Clear();
         foreach (var aircraft in allAircraft)
         {
-            if(aircraft.team == team && aircraft != this)
+            if (aircraft.team == team && aircraft != this)
             {
                 teammates.Add(aircraft);
             }
         }
+        aircraftMovement.teammates.Clear();
+        aircraftMovement.teammates.AddRange(teammates);
     }
 
     private void UpdateTeamTargets()
@@ -236,7 +238,7 @@ public class AIAircraft : MonoBehaviour
             Vector3 enemyForward = threats[0].transform.forward;
             Vector3 evasiveDirection = Vector3.Cross(enemyForward, Vector3.up).normalized;
             float desiredSpeed = Mathf.Clamp(aircraftMovement.currentSpeed + 20f, aircraftMovement.minSpeed, aircraftMovement.maxSpeed);
-            aircraftMovement.MoveAircraft(evasiveDirection, desiredSpeed);
+            aircraftMovement.MoveAircraft(evasiveDirection, desiredSpeed, false, true);
         }
     }
 
@@ -285,7 +287,7 @@ public class AIAircraft : MonoBehaviour
             float distanceToTarget = Vector3.Distance(transform.position, groundTarget.position);
 
             float targetSpeed = Mathf.Clamp(distanceToTarget / 2f, aircraftMovement.minSpeed, aircraftMovement.maxSpeed); 
-            aircraftMovement.MoveAircraft(directionToGroundTarget, targetSpeed);
+            aircraftMovement.MoveAircraft(directionToGroundTarget, targetSpeed, true);
 
             float dotProduct = Vector3.Dot(transform.forward, directionToGroundTarget);
             float threshold = 0.98f;
@@ -321,7 +323,7 @@ public class AIAircraft : MonoBehaviour
         gun.Stop();
         gunAudio.Stop();
         currentState = "Patrolling";
-        aircraftMovement.MoveAircraft(Vector3.forward, aircraftMovement.minSpeed);
+        aircraftMovement.MoveAircraft(Vector3.forward, aircraftMovement.minSpeed, true);
     }
 
     public bool HasGroundTarget()

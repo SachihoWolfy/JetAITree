@@ -8,7 +8,7 @@ public class AircraftStats : MonoBehaviour
     public AudioSource hitAudio;
     public GameObject explodePrefab;
 
-    private AIAircraft aircraft;
+    public AIAircraft aircraft;
     private InfoCanvasController infoCanvasController;
     public ParticleSystem smoke;
     public ParticleSystem hitSystem;
@@ -22,6 +22,7 @@ public class AircraftStats : MonoBehaviour
         infoCanvasController = FindObjectOfType<InfoCanvasController>();
         maxHP = hp;
         criticalHP = hp / 4;
+        infoCanvasController.UpdateTopThreeList();
     }
     void stopInvicibility()
     {
@@ -75,5 +76,6 @@ public class AircraftStats : MonoBehaviour
         aircraft.Respawn();
         hp = 20;
         Invoke("stopInvicibility", 5f);
+        infoCanvasController.UpdateTopThreeList();
     }
 }

@@ -23,6 +23,10 @@ public class ParticleDamage : MonoBehaviour
             AircraftStats stats = other.GetComponent<AircraftStats>();
             if (stats != null && stats != ourStats && stats.GetComponent<AIAircraft>().team != ourStats.GetComponent<AIAircraft>().team)
             {
+                if (stats.hp - damageAmount <= 0)
+                {
+                    ourStats.aircraft.kills++;
+                }
                 stats.TakeDamage(damageAmount);
             }
         }

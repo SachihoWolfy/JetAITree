@@ -33,6 +33,7 @@ public class AIAircraft : MonoBehaviour
     private TargetSelectionTree t_tree;
 
     public string aircraftID = "";
+    public int kills = 0;
 
     void Start()
     {
@@ -64,6 +65,14 @@ public class AIAircraft : MonoBehaviour
 
         behaviorTree = root;
         target = null;
+
+        ChangeID();
+    }
+
+    public void ChangeID()
+    {
+        aircraftID = NVJOBNameGen.GiveAName(3);
+        gameObject.name = aircraftID;
     }
 
     void FixedUpdate()
@@ -144,6 +153,8 @@ public class AIAircraft : MonoBehaviour
         aircraftMovement.ResetAircraft(initialPosition, initialRotation);
         target = null;
         currentState = "Idle";
+        ChangeID();
+        kills = 0;
     }
 
     public void TargetPursuer()

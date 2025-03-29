@@ -200,7 +200,55 @@ public static class NVJOBNameGen
                     "Whitehead", "Whitfield", "Whitley", "Whitney", "Wiggins", "Wilcox", "Wilder", "Wiley", "Wilkerson", "Wilkins", "Wilkinson", "William", "Williams",
                     "Williamson", "Willis", "Wilson", "Winters", "Wise", "Witt", "Wolf", "Wolfe", "Wood", "Woodard", "Woods", "Woodward", "Workman", "Wright",
                     "Wyatt", "Yates", "York", "Young" };
-                nameFinal = firstName[Random.Range(0, firstName.Length)] + " " + secondName[Random.Range(0, secondName.Length)];
+                // Pilot nickname
+                string[] prefix = new string[] {
+            // Cool/Aggressive Callsigns
+            "Viper", "Raptor", "Blaze", "Talon", "Ghost", "Shadow", "Cyclone", "Venom", "Rogue", "Jester",
+            "Bullet", "Storm", "Vortex", "Gunner", "Spitfire", "Sabre", "Razor", "Fox", "Wolf", "Cobra",
+            "Eagle", "Fury", "Nitro", "Scorch", "Comet", "Titan", "Vandal", "Outlaw", "Bravo", "Delta",
+            "Echo", "Ghostrider", "Ironclad", "Knight", "Lancer", "Nomad", "Rampage", "Sentinel", "Torque",
+            "Valkyrie", "Warden", "Zenith", "Inferno", "Scorpion", "Hellhound", "Ripper", "Falcon", "Mako",
+            "Wraith", "Jaguar", "Maverick", "Blackjack", "Onyx", "Havoc", "Bandit", "Dagger", "Hurricane",
+            "Goliath", "Phantom", "Warlock", "Barrage", "Tempest", "Dragoon", "Revenant", "Titanium", "Ragnarok",
+            "Warpath", "Gale", "Tundra", "Blizzard", "Nightmare", "Havok", "Rampart", "Thunder", "Zephyr", "Eclipse",
+
+            // Military/Ironic/Funny Callsigns
+            "Tiny", "Skids", "Magellan", "Yak", "Carrot", "Oven", "Fumbles", "Boomer", "Twitch", "Bambi",
+            "Hollywood", "Speedbump", "Slick", "Snaps", "Trips", "Houdini", "Radar", "Cueball", "Gadget",
+            "Stitch", "Waldo", "Snickers", "Chowder", "Jinx", "Clutch", "Diesel", "Spaz", "Mumbles", "Gump",
+            "Bravo", "Torch", "Zippy", "Rugrat", "Lurch", "Popeye", "Scooter", "Dozer", "Spoons", "Cletus",
+            "Jersey", "Snafu", "Tater", "Frosty", "Goose", "Bingo", "Maverick", "Squirrel", "Bacon", "Dusty",
+            "Wedge", "Shaky", "Puddles", "Sneezy", "Drizzle", "Hiccup", "Tumbles", "Quack", "Grits", "Spork",
+            "Jorts", "Cupcake", "Waffles", "Meatball", "Ketchup", "Slippy", "Dizzy", "Mittens", "Gumbo",
+            "Lumpy", "Tweak", "Sparky", "Mothball", "Pickles", "Chatter", "Derp", "Wheely", "Scooby", "Laces",
+            "Stumble", "Lego", "Pancakes", "Yeti", "Slacks", "Oopsy", "Crusty", "Tinker", "Lugnut", "Flapjack",
+            "Gravy", "Muffin", "Snark", "Crumbs", "Jiggles", "Splat", "Soggy", "Sizzle", "Sprout", "Quackers"
+        };
+
+                string[] suffix = new string[] {
+            // Cool/Aggressive Suffixes
+            "Fang", "Hawk", "Claw", "Strike", "Storm", "Fire", "Hunter", "Dash", "Rider", "Wing",
+            "Talon", "Howl", "Slash", "Bolt", "Vortex", "Burn", "Wraith", "Drift", "Flare", "Pulse",
+            "Gale", "Eclipse", "Razor", "Surge", "Phantom", "Flash", "Night", "Thunder", "Dagger", "Grit",
+            "Ghost", "Charger", "Reaper", "Warrior", "Jugger", "Blaze", "Typhoon", "Fury", "Sentinel",
+            "Echo", "Warp", "Rogue", "Strike", "Frost", "Horizon", "Zephyr", "Specter", "Spartan",
+            "Wrath", "Jet", "Titan", "Hellfire", "Lightning", "Abyss", "Zero", "Sniper", "Nomad",
+            "Archer", "Falcon", "Drakon", "Iron", "Ragnar", "Havoc", "Raptor", "Torment", "Breaker", "Crimson",
+
+            // Military/Ironic/Funny Suffixes
+            "Juice", "Face", "Cheeks", "Nose", "Paws", "Buns", "Mitts", "Boots", "Gums", "Hose",
+            "Flap", "Mouth", "Fingers", "Tush", "Sizzle", "Puddle", "Wobble", "Wiggles", "Tongs",
+            "Gravy", "Chunks", "Beard", "Sprout", "Grits", "Sneeze", "Slacks", "Spork", "Jorts",
+            "Pudding", "Splat", "Knuckles", "Fudge", "Biscuit", "Loaf", "Dribble", "Quack", "Splatter",
+            "Tinker", "Hiccup", "Sizzle", "Chomp", "Cabbage", "Noodle", "Rumble", "Flaps", "Spaz",
+            "Jiggles", "Tweak", "Waddle", "Booger", "Muffin", "Tater", "Fumble", "Lugnut", "Soggy",
+            "Crumbs", "Blip", "Shivers", "Crust", "Lump", "Burp", "Pinto", "Taco", "Burrito", "Cobbler",
+            "Doodle", "Slosh", "Meatloaf", "Tinkerbell", "Bubble", "Jelly", "Pickle", "Mittens", "Sizzle",
+            "Goober", "Toots", "Jolly", "Tango", "Dork", "Giggles", "Snark", "Lumpy", "Fluffy", "Fizzle"
+        };
+                string randomNickname = prefix[Random.Range(0, prefix.Length)] + " " + suffix[Random.Range(0, suffix.Length)];
+
+                nameFinal = firstName[Random.Range(0, firstName.Length)] + " " + secondName[Random.Range(0, secondName.Length)] + " \"" + randomNickname + "\"";
             }
             else if (type == 5 || type == 6)  //  Fantasy Names ---------------------------
             {

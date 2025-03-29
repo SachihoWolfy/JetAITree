@@ -48,8 +48,8 @@ public class CameraBehavior : MonoBehaviour
 
     void UpdateInput()
     {
-        backInput = Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.Mouse1);
-        nextInput = Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.Mouse0);
+        backInput = Input.GetKeyDown(KeyCode.A);
+        nextInput = Input.GetKeyDown(KeyCode.D);
     }
 
     void UpdateGroup()
@@ -114,9 +114,7 @@ public class CameraBehavior : MonoBehaviour
         if (allAircraft.Count == 0) return;
 
         targetIndex = (targetIndex + 1) % allAircraft.Count;
-        curTarget = allAircraft[targetIndex];
-        cam.Target.TrackingTarget = curTarget.transform;
-        UpdateGroup();
+        ChangeTarget(allAircraft[targetIndex]);
     }
 
     void PreviousTarget()
@@ -124,7 +122,12 @@ public class CameraBehavior : MonoBehaviour
         if (allAircraft.Count == 0) return;
 
         targetIndex = (targetIndex - 1 + allAircraft.Count) % allAircraft.Count;
-        curTarget = allAircraft[targetIndex];
+        ChangeTarget(allAircraft[targetIndex]);
+    }
+
+    public void ChangeTarget(AIAircraft desiredTarget)
+    {
+        curTarget = desiredTarget;
         cam.Target.TrackingTarget = curTarget.transform;
         UpdateGroup();
     }

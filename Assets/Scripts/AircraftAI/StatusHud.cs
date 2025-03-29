@@ -48,15 +48,15 @@ public class StatusHud : MonoBehaviour
             aircraftName.color = blueColor;
             pilotImage.color = blueColor;
         }
-        aircraftId = NVJOBNameGen.GiveAName(3);
+        aircraftId = manueverAI.aircraftID;
         aircraftName.text = aircraftId;
-        gameObject.name = aircraftId;
-        manueverAI.aircraftID = aircraftId;
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        aircraftId = manueverAI.aircraftID;
+        aircraftName.text = aircraftId;
         UpdateManueverHUD();
         UpdateTargetHUD();
     }

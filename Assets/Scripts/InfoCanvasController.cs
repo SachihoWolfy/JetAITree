@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 public class InfoCanvasController : MonoBehaviour
 {
     private AIAircraft aircraft;
+    private List<AIAircraft> topThree = new List<AIAircraft>();
+    private List<AIAircraft> allAircraft = new List<AIAircraft>();
     private CameraBehavior cameraBehavior;
     private ManueverStatus m_status;
     private TargetingStatus t_status;
@@ -37,6 +40,8 @@ public class InfoCanvasController : MonoBehaviour
     public TMP_Text nameText;
     public Image pilotImage;
 
+    public LeaderBoardButton[] topThreeButtons;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,6 +58,71 @@ public class InfoCanvasController : MonoBehaviour
         UpdateTargetTree();
         UpdateManueverTree();
         UpdateSpectate();
+    }
+    public void UpdateTopThreeList()
+    {
+        if(allAircraft.Count == 0)
+        {
+            allAircraft.Clear();
+            allAircraft.AddRange(FindObjectsOfType<AIAircraft>());
+        }
+        topThree.Clear();
+        topThree.AddRange(allAircraft);
+        topThree.Sort((a, b) => b.kills.CompareTo(a.kills));
+        topThree = topThree.Take(3).ToList();
+        UpdateLeaderBoardButtons();
+    }
+
+    void UpdateLeaderBoardButtons()
+    {
+        int index = 0;
+        foreach(LeaderBoardButton button in topThreeButtons)
+        {
+            if (topThree.Count > index)
+            {
+                button.aircraftID.text = topThree[index].aircraftID;
+                button.killText.text = topThree[index].kills.ToString();
+                if (topThree[index].team == Team.Red)
+                {
+                    button.pilotImage.color = redScoreText.color;
+                    button.aircraftID.color = redScoreText.color;
+                    button.killText.color = redScoreText.color;
+                    button.buttonImage.color = redScoreText.color;
+                }
+                else
+                {
+                    button.pilotImage.color = blueScoreText.color;
+                    button.aircraftID.color = blueScoreText.color;
+                    button.killText.color = blueScoreText.color;
+                    button.buttonImage.color = blueScoreText.color;
+                }
+            }
+            else if(allAircraft.Count > index)
+            {
+                button.aircraftID.text = allAircraft[index].aircraftID;
+                button.killText.text = allAircraft[index].kills.ToString();
+                if (allAircraft[index].team == Team.Red)
+                {
+                    button.pilotImage.color = redScoreText.color;
+                    button.aircraftID.color = redScoreText.color;
+                    button.killText.color = redScoreText.color;
+                    button.buttonImage.color = redScoreText.color;
+                }
+                else
+                {
+                    button.pilotImage.color = blueScoreText.color;
+                    button.aircraftID.color = blueScoreText.color;
+                    button.killText.color = blueScoreText.color;
+                    button.buttonImage.color = blueScoreText.color;
+                }
+            }
+            index++;
+        }
+    }
+
+    public void OnLeaderboardButtonPress(int index)
+    {
+        cameraBehavior.ChangeTarget(topThree[index]);
     }
 
     void UpdateTargetTree()
@@ -210,4 +280,12 @@ public class StatusUIElement
     public TMP_Text infoText;
     public TMP_Text actionText;
     public Image image;
+}
+[System.Serializable]
+public class LeaderBoardButton
+{
+    public TMP_Text killText;
+    public TMP_Text aircraftID;
+    public Image pilotImage;
+    public Image buttonImage;
 }

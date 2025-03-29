@@ -791,11 +791,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hp: 20
+  invincible: 0
   hitAudio: {fileID: 9024756309091972577}
   explodePrefab: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
+  hitParticles: {fileID: 3176918320199859088}
+  aircraft: {fileID: 7606718037583856881}
   smoke: {fileID: 4080538294167139650}
-  hitSystem: {fileID: 3176918320199859088}
-  invincible: 0
+  team: 0
+  ID: 
+  kills: 0
 --- !u!114 &378778378529389688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -841,6 +845,7 @@ MonoBehaviour:
   enemies: []
   threats: []
   aircraftID: 
+  kills: 0
 --- !u!114 &6776174076210864544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1118,7 +1123,7 @@ GameObject:
   - component: {fileID: 6979166761740685462}
   - component: {fileID: 9024756309091972577}
   m_Layer: 0
-  m_Name: Hit
+  m_Name: HitSound
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

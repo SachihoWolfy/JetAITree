@@ -27,8 +27,6 @@ public class AIAircraft : MonoBehaviour
     public List<AIAircraft> teammates = new List<AIAircraft>();
     public List<AIAircraft> enemies = new List<AIAircraft>();
     public List<AIAircraft> threats = new List<AIAircraft>();
-    private float timeSinceLastSwitch = 0.0f;
-    private float targetSwitchDelay = 10.0f;
     private bool doEratic;
     private TargetSelectionTree t_tree;
 
@@ -83,7 +81,6 @@ public class AIAircraft : MonoBehaviour
         UpdateTeamTargets();
         behaviorTree.Execute();
         engagementTime += Time.deltaTime;
-        timeSinceLastSwitch += Time.deltaTime;
 
         doEratic = t_tree.confidenceValue > 0.6f;
 

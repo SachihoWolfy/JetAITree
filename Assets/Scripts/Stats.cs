@@ -7,6 +7,9 @@ public class Stats : MonoBehaviour
     public AudioSource hitAudio;
     public GameObject explodePrefab;
     public ParticleSystem hitParticles;
+    public int kills = 0;
+    public Team team;
+    public string ID;
 
     protected int maxHP;
     protected int criticalHP;
@@ -25,7 +28,8 @@ public class Stats : MonoBehaviour
         }
 
         hp -= damage;
-        hitParticles?.Play();
+        hitParticles.Play();
+
 
         if (hitAudio && !hitAudio.isPlaying)
         {
@@ -38,7 +42,15 @@ public class Stats : MonoBehaviour
             Explode();
         }
     }
-
+    public void StopInvincibility()
+    {
+        invincible = false;
+    }
+    public void UpdateID(string desiredID)
+    {
+        ID = desiredID;
+        gameObject.name = ID;
+    }
     protected virtual void Explode()
     {
         if (explodePrefab)

@@ -6,6 +6,7 @@ public class GroundTargetManager : MonoBehaviour
     public static GroundTargetManager Instance { get; private set; }
 
     public List<GroundTargetStats> allGroundTargets = new List<GroundTargetStats>();
+    public List<AircraftStats> allAirTargets = new List<AircraftStats>();
 
     private void Awake()
     {
@@ -18,21 +19,20 @@ public class GroundTargetManager : MonoBehaviour
     private void Start()
     {
         FindAllGroundTargets();
+        FindAllAirTargets();
     }
 
     private void FindAllGroundTargets()
     {
         allGroundTargets.Clear();
-        GroundTargetStats[] targets = FindObjectsOfType<GroundTargetStats>();
-
-        foreach (var target in targets)
-        {
-            allGroundTargets.Add(target);
-        }
-
-        Debug.Log("Found " + allGroundTargets.Count + " ground targets.");
+        allGroundTargets.AddRange(FindObjectsOfType<GroundTargetStats>());
     }
 
+    private void FindAllAirTargets()
+    {
+        allAirTargets.Clear();
+        allAirTargets.AddRange(FindObjectsOfType<AircraftStats>());
+    }
     public void RepairTarget(string targetID, int repairAmount)
     {
         foreach (var target in allGroundTargets)
@@ -56,4 +56,30 @@ public class GroundTargetManager : MonoBehaviour
             }
         }
     }
+    public GroundTargetStats GetRandomEnemyGroundTarget(Team team)
+    {
+        List<GroundTargetStats> enemyTargets = new List<GroundTargetStats>();
+
+        foreach (var target in allGroundTargets)
+        {
+            if (target.team != team && !target.isDestroyed)
+            {
+                enemyTargets.Add(target);
+            }
+        }
+
+        if (enemyTargets.Count == 0)
+        {
+            foreach (var target in allGroundTargets)
+            {
+                if (target.team != team)
+                {
+                    return target;
+                }
+            }
+        }
+
+        return enemyTargets[Random.Range(0, enemyTargets.Count)];
+    }
+
 }

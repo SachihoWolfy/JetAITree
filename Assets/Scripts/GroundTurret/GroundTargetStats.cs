@@ -1,14 +1,19 @@
 using UnityEngine;
-
+using UnityEditor;
+using UnityEditor.TerrainTools;
 public class GroundTargetStats : Stats
 {
     public Transform spawnPoint;
+    private Vector3 spawnPointPosition;
+    private Quaternion spawnPointRotation;
     public float respawnRadius = 10f;
+    public float respawnTime = 5f;
     public bool canRespawn = true;
     public bool isDestroyed = false;
+    public Stats target;
 
-    public string ID = "";
-    public Team team;
+    public ParticleSystem fireParticles;
+    public ParticleSystem smokeParticles;
     [SerializeField] public bool generateRandomName = true;
 
     protected override void Start()
@@ -22,6 +27,16 @@ public class GroundTargetStats : Stats
         {
             UpdateID(ID);
         }
+        if (spawnPoint == null)
+        {
+            spawnPointPosition = transform.position;
+            spawnPointRotation = transform.rotation;
+        }
+        else
+        {
+            spawnPointPosition = spawnPoint.position;
+            spawnPointRotation = spawnPoint.rotation;
+        }
     }
 
     public override void TakeDamage(int damage)
@@ -29,6 +44,11 @@ public class GroundTargetStats : Stats
         if (isDestroyed) return;
 
         base.TakeDamage(damage);
+
+        if(hp <= criticalHP)
+        {
+            smokeParticles.Play();
+        }
 
         if (hp <= 0)
         {
@@ -46,9 +66,11 @@ public class GroundTargetStats : Stats
 
     private void EnterDestroyedState()
     {
+        fireParticles.Play();
+        invincible = true;
         if (canRespawn)
         {
-            Invoke(nameof(Respawn), 5f);
+            Invoke(nameof(Respawn), respawnTime);
         }
         else
         {
@@ -59,14 +81,18 @@ public class GroundTargetStats : Stats
     public void Respawn()
     {
         if (!canRespawn) return;
+        Invoke(nameof(StopInvincibility), 5);
 
+        fireParticles.Stop();
+        smokeParticles.Stop();
         isDestroyed = false;
         hp = maxHP;
 
         Vector3 randomOffset = Random.insideUnitSphere * respawnRadius;
         randomOffset.y = 0;
 
-        transform.position = spawnPoint.position + randomOffset;
+        transform.position = spawnPointPosition + randomOffset;
+        transform.rotation = spawnPointRotation;
         Debug.Log(ID + " has respawned!");
     }
 
@@ -88,18 +114,12 @@ public class GroundTargetStats : Stats
         hp += repairAmount;
         if (hp >= maxHP)
         {
+            invincible = false;
+            fireParticles.Stop();
+            smokeParticles.Stop();
             hp = maxHP;
             isDestroyed = false;
             Debug.Log(ID + " has been fully repaired!");
         }
-    }
-
-    public void UpdateID(string desiredID)
-    {
-        if (!string.Equals(ID, desiredID))
-        {
-            ID = desiredID;
-        }
-        gameObject.name = ID;
     }
 }

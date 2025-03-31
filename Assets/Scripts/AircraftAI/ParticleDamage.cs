@@ -4,7 +4,7 @@ using UnityEngine;
 public class ParticleDamage : MonoBehaviour
 {
     public int damageAmount = 20;
-    public AircraftStats ourStats;
+    public Stats ourStats;
 
     private ParticleSystem partSystem;
     private ParticleSystem.Particle[] particles;
@@ -20,14 +20,14 @@ public class ParticleDamage : MonoBehaviour
     {
         if (other.CompareTag("Damagable")) 
         {
-            AircraftStats stats = other.GetComponent<AircraftStats>();
-            if (stats != null && stats != ourStats && stats.GetComponent<AIAircraft>().team != ourStats.GetComponent<AIAircraft>().team)
+            Stats otherStats = other.GetComponent<Stats>();
+            if (otherStats != null && otherStats != ourStats && otherStats.team != ourStats.team)
             {
-                if (stats.hp - damageAmount <= 0)
+                if (otherStats.hp - damageAmount <= 0 && !otherStats.invincible)
                 {
-                    ourStats.aircraft.kills++;
+                    ourStats.kills++;
                 }
-                stats.TakeDamage(damageAmount);
+                otherStats.TakeDamage(damageAmount);
             }
         }
     }

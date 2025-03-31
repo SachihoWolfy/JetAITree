@@ -152,6 +152,7 @@ public class TargetSelectionTree : MonoBehaviour
             aircraft.target = null;
             currentState = "Clearing Target - Fully Safe";
             status = TargetingStatus.Ground;
+            aircraft.groundTarget = GroundTargetManager.Instance.GetRandomEnemyGroundTarget(aircraft.team).transform;
         }));
 
         // Add sequences to selectors

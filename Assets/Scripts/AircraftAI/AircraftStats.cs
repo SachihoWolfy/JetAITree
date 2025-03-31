@@ -6,14 +6,11 @@ public class AircraftStats : Stats
     private InfoCanvasController infoCanvasController;
     public ParticleSystem smoke;
 
-    public Team team;
-    public string ID = "";
-    public int kills = 0;
-
     protected override void Start()
     {
         base.Start();
         aircraft = GetComponent<AIAircraft>();
+        team = aircraft.team;
         infoCanvasController = FindObjectOfType<InfoCanvasController>();
         infoCanvasController.UpdateTopThreeList();
     }
@@ -26,26 +23,12 @@ public class AircraftStats : Stats
     void UpdateStats()
     {
         UpdateID(aircraft.aircraftID);
-        UpdateKills(aircraft.kills);
-    }
-
-    public void UpdateID(string desiredID)
-    {
-        if (!string.Equals(ID, desiredID))
-        {
-            ID = desiredID;
-            gameObject.name = ID;
-        }
+        aircraft.kills = kills;
     }
 
     public void UpdateKills(int desiredKills)
     {
         kills = desiredKills;
-    }
-
-    void StopInvincibility()
-    {
-        invincible = false;
     }
 
     public override void TakeDamage(int damage)

@@ -19,6 +19,7 @@ public class GroundGunController : MonoBehaviour
     public float maxPitchAngle = 60f;    // Maximum pitch angle (upward)
     public float minPitchAngle = -60f;   // Minimum pitch angle (downward)
     private GroundTargetStats stats;
+    public bool doLineOfSight = false;
 
     private void Start()
     {
@@ -31,7 +32,26 @@ public class GroundGunController : MonoBehaviour
 
         RotateToTarget();
 
-        if (Vector3.Distance(transform.position, target.position) <= fireRange && !stats.isDestroyed)
+        bool inRange = Vector3.Distance(transform.position, target.position) <= fireRange;
+        bool hasLineOfSight = true;
+
+        if (doLineOfSight)
+        {
+            Vector3 origin = fireEffect.transform.position; // or use gun barrel
+            Vector3 direction = target.position - origin;
+
+            // Check if anything is between us and the target
+            if (Physics.Linecast(origin, target.position, out RaycastHit hit))
+            {
+                hasLineOfSight = hit.transform == target;
+            }
+        }
+        else
+        {
+            hasLineOfSight = true;
+        }
+
+        if (inRange && hasLineOfSight && !stats.isDestroyed)
         {
             if (!fireEffect.isPlaying)
             {

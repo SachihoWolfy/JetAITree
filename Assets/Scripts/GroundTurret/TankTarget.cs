@@ -15,6 +15,7 @@ public class TankTarget : MonoBehaviour
     {
         gunController = GetComponent<GroundGunController>();
         ourStats = GetComponent<GroundTargetStats>();
+        gunController.doLineOfSight = true;
     }
 
     void Update()
@@ -29,7 +30,7 @@ public class TankTarget : MonoBehaviour
 
         foreach (GroundTargetStats target in GroundTargetManager.Instance.allGroundTargets)
         {
-            if (target == null || !target.gameObject.activeInHierarchy) continue; // Skip inactive targets
+            if (target == null || !target.gameObject.activeInHierarchy || target.isDestroyed) continue; // Skip inactive targets
 
             float distance = Vector3.Distance(transform.position, target.transform.position);
             if (distance < shortestDistance && target.team != ourStats.team)

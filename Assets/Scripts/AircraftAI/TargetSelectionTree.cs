@@ -11,7 +11,7 @@ public class TargetSelectionTree : MonoBehaviour
     public float safetyValue = 0.5f;
     public float confidenceValue = 0.5f;
     private float maxDistance = 500f;
-    private float maxSafety = 1.0f;
+    protected float maxSafety = 1.0f;
     private float maxConfidence = 1.0f;
     private float safetyIncreaseRate = 0.05f;
     private float safetyDecayRate = 0.2f;
@@ -20,13 +20,13 @@ public class TargetSelectionTree : MonoBehaviour
 
     public string currentState = "Idle";
 
-    private float timeSinceLastSwitch = 0.0f;
-    private float targetSwitchDelay = 10.0f;
+    protected float timeSinceLastSwitch = 0.0f;
+    protected float targetSwitchDelay = 10.0f;
 
-    private AIAircraft targetAI;
+    protected AIAircraft targetAI;
 
     public TargetingStatus status;
-    void Start()
+    public virtual void Start()
     {
         aircraft = GetComponent<AIAircraft>();
         targetSelectionTree = BuildTargetSelectionTree();
@@ -83,7 +83,7 @@ public class TargetSelectionTree : MonoBehaviour
         }
     }
 
-    private BTSelector BuildTargetSelectionTree()
+    public virtual BTSelector BuildTargetSelectionTree()
     {
         // Lets lay this out. First the root.
         BTSelector root = new BTSelector();
@@ -180,16 +180,16 @@ public class TargetSelectionTree : MonoBehaviour
         }
         return distance;
     }
-    bool CheckDistance(Transform target)
+    protected bool CheckDistance(Transform target)
     {
         return GetDistance(target) < maxDistance;
     }
-    private Transform FindBestPursuer()
+    protected Transform FindBestPursuer()
     {
         return aircraft.threats.OrderByDescending(t => Vector3.Dot(t.transform.forward, (aircraft.transform.position - t.transform.position).normalized)).FirstOrDefault()?.transform;
     }
 
-    private AIAircraft GetLeastSafeTeammate()
+    protected AIAircraft GetLeastSafeTeammate()
     {
         var leastSafeTeammate = aircraft.teammates
             .Where(t => t.IsInDanger() && t.threats.Count>0) 
@@ -200,7 +200,7 @@ public class TargetSelectionTree : MonoBehaviour
     }
 
 
-    private Transform FindThreateningEnemy(AIAircraft teammate)
+    protected Transform FindThreateningEnemy(AIAircraft teammate)
     {
         List<AIAircraft> enemies = aircraft.enemies;
         AIAircraft potentialTarget = null;
@@ -223,7 +223,7 @@ public class TargetSelectionTree : MonoBehaviour
         }
         return potentialTarget.transform;
     }
-    private Transform FindStrafingEnemy()
+    protected Transform FindStrafingEnemy()
     {
         foreach (AIAircraft enemy in aircraft.enemies)
         {
@@ -235,7 +235,7 @@ public class TargetSelectionTree : MonoBehaviour
         return null;
     }
 
-    private Transform FindBestTarget()
+    protected Transform FindBestTarget()
     {
         var target = aircraft.FindBestTarget();
         if (target == null)

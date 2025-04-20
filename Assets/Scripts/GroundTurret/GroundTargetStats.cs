@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEditor;
+using UnityEngine.AI;
 public class GroundTargetStats : Stats
 {
     public Transform spawnPoint;
@@ -90,8 +91,25 @@ public class GroundTargetStats : Stats
         Vector3 randomOffset = Random.insideUnitSphere * respawnRadius;
         randomOffset.y = 0;
 
-        transform.position = spawnPointPosition + randomOffset;
-        transform.rotation = spawnPointRotation;
+        NavMeshAgent agent = GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.enabled = false;
+        }
+        if(spawnPoint != null)
+        {
+            transform.position = spawnPoint.position;
+            transform.rotation = spawnPoint.rotation;
+        }
+        else
+        {
+            transform.position = spawnPointPosition + randomOffset;
+            transform.rotation = spawnPointRotation;
+        }
+        if (agent != null)
+        {
+            agent.enabled = true;
+        }
         Debug.Log(ID + " has respawned!");
     }
 

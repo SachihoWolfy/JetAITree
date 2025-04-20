@@ -26,27 +26,24 @@ public class GroundVehicle : MonoBehaviour
         }
     }
 
-    // Move the vehicle towards the target
     private void MoveToTarget()
     {
         if (!isMoving)
         {
-            agent.SetDestination(target);  // Set the target position
+            agent.SetDestination(target);  
             isMoving = true;
         }
 
-        // Check if we've reached the target
         if (Vector3.Distance(transform.position, target) <= agent.stoppingDistance)
         {
             isMoving = false;
-            agent.ResetPath();  // Stop the movement once we reach the target
+            agent.ResetPath(); 
         }
     }
 
-    // You can call this method to update the target dynamically
     public void SetTarget(Vector3 newTarget)
     {
         target = newTarget;
-        isMoving = false; // Reset movement
+        isMoving = false; 
     }
 }

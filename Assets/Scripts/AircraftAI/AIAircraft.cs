@@ -17,7 +17,7 @@ public class AIAircraft : MonoBehaviour
     public bool strafing = false;
 
     public AircraftMovement aircraftMovement;
-    private BTSelector behaviorTree;
+    public BTSelector behaviorTree;
 
     private Vector3 initialPosition;
     private Quaternion initialRotation;
@@ -43,6 +43,14 @@ public class AIAircraft : MonoBehaviour
         initialPosition = transform.position;
         initialRotation = transform.rotation;
 
+        BuildTree();
+        target = null;
+
+        ChangeID();
+    }
+
+    public virtual void BuildTree()
+    {
         // Set up the behavior tree
         BTSelector root = new BTSelector();
 
@@ -62,9 +70,6 @@ public class AIAircraft : MonoBehaviour
         root.AddChild(strafingSequence);
 
         behaviorTree = root;
-        target = null;
-
-        ChangeID();
     }
 
     public void ChangeID()
@@ -152,6 +157,7 @@ public class AIAircraft : MonoBehaviour
         currentState = "Idle";
         ChangeID();
         kills = 0;
+        GetComponent<AircraftStats>().kills = 0;
     }
 
     public void TargetPursuer()
@@ -258,7 +264,7 @@ public class AIAircraft : MonoBehaviour
         }
     }
 
-    public void EngageDogfight()
+    public virtual void EngageDogfight()
     {
         strafing = false;
         m_status = ManueverStatus.Dogfighting;
@@ -290,7 +296,7 @@ public class AIAircraft : MonoBehaviour
         }
     }
 
-    public void PerformStrafingRun()
+    public virtual void PerformStrafingRun()
     {
         strafing = true;
         currentState = "Strafing Run";

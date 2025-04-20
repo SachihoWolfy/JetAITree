@@ -50,7 +50,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 218
   DopplerLevel: 0.3
   MinDistance: 1
   MaxDistance: 1000
@@ -196,7 +196,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 203
   DopplerLevel: 2
   MinDistance: 1
   MaxDistance: 200
@@ -342,7 +342,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 54
   DopplerLevel: 2
   MinDistance: 1
   MaxDistance: 400
@@ -795,11 +795,11 @@ MonoBehaviour:
   hitAudio: {fileID: 9024756309091972577}
   explodePrefab: {fileID: 1121192042590650, guid: e1b08032bec16ba4eb1ae23cbd572664, type: 3}
   hitParticles: {fileID: 3176918320199859088}
-  aircraft: {fileID: 7606718037583856881}
-  smoke: {fileID: 4080538294167139650}
+  kills: 0
   team: 0
   ID: 
-  kills: 0
+  aircraft: {fileID: 7606718037583856881}
+  smoke: {fileID: 4080538294167139650}
 --- !u!114 &378778378529389688
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1162,7 +1162,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 98
   DopplerLevel: 0.65
   MinDistance: 1
   MaxDistance: 1000
@@ -1977,7 +1977,7 @@ AudioSource:
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
-  Priority: 128
+  Priority: 199
   DopplerLevel: 5
   MinDistance: 1
   MaxDistance: 500
